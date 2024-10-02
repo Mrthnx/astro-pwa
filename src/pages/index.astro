@@ -3,8 +3,14 @@ import Layout from "../layouts/Layout.astro";
 ---
 
 <Layout title="Welcome to Astro.">
-  <div class="flex h-full w-full items-center justify-center p-4">
+  <div class="flex flex-col h-full w-full items-center justify-center p-4">
     <h1 class="text-xl">Welcome to Astro</h1>
+    <button
+      onclick="listBluetoothDevices()"
+      class="bg-blue-500 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-700 transition duration-300"
+    >
+      Scan for Bluetooth Devices v2
+    </button>
 
     <div
       id="loadingOverlay"
@@ -15,11 +21,25 @@ import Layout from "../layouts/Layout.astro";
     </div>
   </div>
 
-  <script>
+  <script is:inline>
+    console.log("Bluetooth API disponible:", "bluetooth" in navigator);
+
     const $loadingOverlay = document.getElementById("loadingOverlay");
     $loadingOverlay?.classList.remove("hidden");
     setTimeout(() => {
       $loadingOverlay?.classList.add("hidden");
     }, 2000);
+
+    async function listBluetoothDevices() {
+      try {
+        const device = await navigator.bluetooth.requestDevice({
+          acceptAllDevices: true,
+        });
+
+        alert(`Device found: ${device.name}`);
+      } catch (error) {
+        alert(`Error: ${error}`);
+      }
+    }
   </script>
 </Layout>

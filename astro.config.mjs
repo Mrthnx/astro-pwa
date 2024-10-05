@@ -13,6 +13,7 @@ export default defineConfig({
       scope: "/",
       includeAssets: ["favicon.svg"],
       registerType: "autoUpdate",
+      injectRegister: "inline",
       manifest: {
         name: "Astro PWA",
         short_name: "Astro PWA",
@@ -38,6 +39,8 @@ export default defineConfig({
       },
       workbox: {
         cleanupOutdatedCaches: true,
+        skipWaiting: true,
+        clientsClaim: true,
         navigateFallback: "/",
         globPatterns: ["**/*.{css,js,html,svg,png,ico,txt}"],
         runtimeCaching: [

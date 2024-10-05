@@ -63,8 +63,27 @@
   const menuButton = document.getElementById("menu-button");
   const sidebar = document.getElementById("sidebar");
   const divButton = document.getElementById("div-button-add-plant");
+  let sidebarIsOpen = false;
+
+  document.addEventListener("click", (event) => {
+    // Verificar si el clic fue fuera del div
+    console.log(sidebarIsOpen);
+    if (
+      !sidebar.contains(event.target) &&
+      !menuButton.contains(event.target) &&
+      sidebarIsOpen
+    ) {
+      if (sidebar.classList.contains("sidebar-open")) {
+        sidebar.classList.remove("sidebar-open");
+        sidebarIsOpen = false;
+      }
+    }
+  });
 
   menuButton.addEventListener("click", () => {
+    setTimeout(() => {
+      sidebarIsOpen = !sidebarIsOpen;
+    }, 50);
     sidebar.classList.toggle("sidebar-open");
   });
 

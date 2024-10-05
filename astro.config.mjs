@@ -8,7 +8,6 @@ export default defineConfig({
   integrations: [
     tailwind(),
     AstroPWA({
-      mode: "development",
       base: "/",
       scope: "/",
       includeAssets: ["favicon.svg"],

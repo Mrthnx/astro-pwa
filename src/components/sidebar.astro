@@ -1,0 +1,253 @@
+---
+
+---
+
+<!-- Navbar -->
+<nav
+  class="bg-blue-900 p-4 flex justify-between items-center top-0 left-0 w-full z-10"
+>
+  <div class="hidden md:block text-white text-2xl">PDM Monitor</div>
+  <div class="flex gap-8">
+    <button id="menu-button" class="text-white focus:outline-none">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-6 w-6"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M4 6h16M4 12h16m-7 6h7"></path>
+      </svg>
+    </button>
+  </div>
+</nav>
+<div class="flex">
+  <!-- Sidebar -->
+  <div
+    id="sidebar"
+    class="z-10 fixed left-0 w-64 h-full bg-blue-900 text-white sidebar overflow-y-auto"
+  >
+    <!-- Menús -->
+    <ul id="plants-container"></ul>
+
+    <div class="flex justify-center items-center">
+      <div id="div-button-add-plant" class="p-4">
+        <button
+          id="add-plant"
+          class="border-white rounded-full border-2 px-4 py-1 hover:bg-white hover:text-blue-900"
+        >
+          Add Plant
+        </button>
+      </div>
+    </div>
+    <br />
+  </div>
+</div>
+<style>
+  /* Custom styles for sidebar */
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+  }
+
+  .sidebar-open {
+    transform: translateX(0);
+  }
+</style>
+<script is:inline>
+  // Función para mostrar u ocultar el sidebar
+  const menuButton = document.getElementById("menu-button");
+  const sidebar = document.getElementById("sidebar");
+  const divButton = document.getElementById("div-button-add-plant");
+
+  menuButton.addEventListener("click", () => {
+    sidebar.classList.toggle("sidebar-open");
+  });
+
+  function removePlant(id) {
+    const plantId = id.split("-")[1];
+    const plantsStore = localStorage.getItem("plants") || "[]";
+    if (plantsStore) {
+      let plants = JSON.parse(plantsStore);
+      plants = plants.filter(Boolean);
+      const idx = plants.findIndex((plant) => plant.id == plantId);
+      if (idx >= 0) {
+        plants.splice(idx, 1);
+        localStorage.setItem("plants", JSON.stringify(plants.filter(Boolean)));
+      }
+    }
+    window.location.reload();
+  }
+
+  // Añadir el evento de click a cada botón
+  function forEachButtonSidebar() {
+    document.querySelectorAll("button[data-name]").forEach((button) => {
+      button.addEventListener("click", function () {
+        const hierarchyName = this.getAttribute("data-name");
+        if (hierarchyName.startsWith("bplant")) {
+          removePlant(hierarchyName);
+        } else {
+          toggleMenu(hierarchyName);
+        }
+      });
+    });
+  }
+
+  // Función para mostrar u ocultar los menús y submenús
+  function toggleMenu(id) {
+    const menu = document.getElementById(id);
+    if (menu) {
+      const menuType = id.split("-")[0]; // Obtener el tipo de menú (por ejemplo, 'plant', 'area', 'system', etc.)
+      // Cerrar otros menús del mismo tipo
+      document
+        .querySelectorAll(`ul[id^="${menuType}"]`)
+        .forEach((otherMenu) => {
+          if (
+            otherMenu.id !== menu.id &&
+            !otherMenu.classList.contains("hidden")
+          ) {
+            otherMenu.classList.add("hidden"); // Cerrar el otro menú
+          }
+        });
+
+      // Alternar el menú actual
+      menu.classList.toggle("hidden");
+    }
+  }
+
+  // Función para cargar los datos de los menús
+  function createHierarchyList(plants) {
+    const container = document.getElementById("plants-container");
+    plants.filter(Boolean).forEach((plant) => {
+      const plantButton = document.createElement("button");
+      plantButton.className =
+        "w-full text-left py-2 bg-blue-800 focus:outline-none text-sm hover:bg-yellow-700";
+      plantButton.dataset.name = "mplant-" + plant.id;
+      plantButton.textContent = plant.description;
+
+      const areaList = document.createElement("ul");
+      areaList.id = "mplant-" + plant.id;
+      areaList.className = "hidden"; // Oculto inicialmente
+
+      plant.areas.forEach((area) => {
+        const areaLi = document.createElement("li");
+
+        const areaButton = document.createElement("button");
+        areaButton.className =
+          "w-full text-left p-1 pl-2 bg-blue-700 focus:outline-none text-sm hover:bg-yellow-700";
+        areaButton.dataset.name = "marea-" + area.id;
+        areaButton.textContent = area.description;
+
+        const systemList = document.createElement("ul");
+        systemList.id = "marea-" + area.id;
+        systemList.className = "hidden"; // Oculto inicialmente
+
+        area.systems.forEach((system) => {
+          const systemLi = document.createElement("li");
+
+          const systemButton = document.createElement("button");
+          systemButton.className =
+            "w-full text-left p-1 pl-3 bg-blue-600 focus:outline-none text-sm hover:bg-yellow-700";
+          systemButton.dataset.name = "msystem-" + system.id;
+          systemButton.textContent = system.description;
+
+          const mawoiList = document.createElement("ul");
+          mawoiList.id = "msystem-" + system.id;
+          mawoiList.className = "hidden"; // Oculto inicialmente
+
+          system.mawois.forEach((mawoi) => {
+            const mawoiLi = document.createElement("li");
+            const mawoiButton = document.createElement("button");
+            mawoiButton.className =
+              "w-full text-left p-1 pl-4 bg-blue-500 focus:outline-none text-sm hover:bg-yellow-700";
+            mawoiButton.dataset.name = "mmawoi-" + mawoi.id;
+            mawoiButton.textContent = mawoi.description;
+
+            const pointList = document.createElement("ul");
+            pointList.id = "mmawoi-" + mawoi.id;
+            pointList.className = "hidden"; // Oculto inicialmente
+
+            mawoi.points.forEach((point) => {
+              const pointLi = document.createElement("li");
+              pointLi.className = "p-1 bg-blue-800 text-xs hover:bg-yellow-700";
+
+              const pointSpan = document.createElement("span");
+              pointSpan.className = "p-2 pl-5";
+              pointSpan.textContent = point.description;
+
+              pointLi.appendChild(pointSpan);
+              pointList.appendChild(pointLi);
+            });
+
+            mawoiLi.appendChild(mawoiButton);
+            mawoiLi.appendChild(pointList);
+            mawoiList.appendChild(mawoiLi);
+          });
+
+          systemLi.appendChild(systemButton);
+          systemLi.appendChild(mawoiList);
+          systemList.appendChild(systemLi);
+        });
+
+        areaLi.appendChild(areaButton);
+        areaLi.appendChild(systemList);
+        areaList.appendChild(areaLi);
+      });
+
+      const plantLi = document.createElement("li");
+
+      const plantButtonDelete = document.createElement("button");
+      plantButtonDelete.className =
+        "w-full text-left p-2 bg-red-800 focus:outline-none text-sm hover:bg-red-600 w-[20px]";
+      plantButtonDelete.dataset.name = "bplant-" + plant.id;
+      // symbol delete
+      plantButtonDelete.textContent = "\u00D7";
+
+      const plantDiv = document.createElement("div");
+      plantDiv.className = "flex bg-blue-800";
+      plantDiv.appendChild(plantButton);
+      plantDiv.appendChild(plantButtonDelete);
+
+      plantLi.appendChild(plantDiv);
+      plantLi.appendChild(areaList);
+      container.appendChild(plantLi);
+    });
+
+    forEachButtonSidebar();
+  }
+
+  const plantsStore = localStorage.getItem("plants");
+  if (plantsStore) {
+    const plants = JSON.parse(plantsStore);
+    createHierarchyList(plants);
+  }
+
+  var isStatusOnline = navigator.onLine;
+
+  window.addEventListener("online", () => {
+    console.log("online");
+    isStatusOnline = true;
+    if (divButton) {
+      divButton.classList.remove("hidden");
+    }
+  });
+
+  window.addEventListener("offline", () => {
+    console.log("offline");
+    isStatusOnline = false;
+    if (divButton) {
+      divButton.classList.add("hidden");
+    }
+  });
+
+  const $buttonAddPlant = document.getElementById("add-plant");
+  if (isStatusOnline && $buttonAddPlant) {
+    $buttonAddPlant.addEventListener("click", () => {
+      showModalPlants();
+    });
+  }
+</script>

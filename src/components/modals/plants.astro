@@ -1,0 +1,184 @@
+<div
+  id="modal-select-plant"
+  class="fixed inset-0 flex flex-col items-center justify-center bg-black bg-opacity-50 z-10 hidden"
+>
+  <div
+    class="bg-white rounded-lg p-4 w-10/12 max-w-md h-[70vh] overflow-y-auto"
+  >
+    <table id="table-select-plant" class="w-full">
+      <thead>
+        <tr>
+          <th class="text-center">Account</th>
+          <th class="text-center">Plant</th>
+        </tr>
+        <tr>
+          <th>
+            <input
+              id="search-account"
+              type="text"
+              class="w-full p-2 text-sm border-gray-200 outline-none"
+              placeholder="Search account"
+            />
+          </th>
+          <th>
+            <input
+              id="search-plant"
+              type="text"
+              class="w-full p-2 text-sm border-gray-200 outline-none"
+              placeholder="Search plant"
+            />
+          </th>
+        </tr>
+      </thead>
+      <tbody id="tbody-select-plant"> </tbody>
+    </table>
+  </div>
+  <script is:inline>
+    const $modalSelectPlant = document.getElementById("modal-select-plant");
+    const $tableSelectPlant = document.getElementById("table-select-plant");
+    const $searchAccount = document.getElementById("search-account");
+    const $searchPlant = document.getElementById("search-plant");
+    let modalIsOpen = false;
+    let typingTimer;
+
+    if ($searchAccount) {
+      $searchAccount.addEventListener("keyup", function (event) {
+        clearTimeout(typingTimer);
+        const account = event.target.value;
+        let plant = "";
+        if ($searchPlant) {
+          plant = $searchPlant.value;
+        }
+        typingTimer = setTimeout(() => {
+          getPlants(account, plant);
+        }, 400);
+      });
+    }
+
+    if ($searchPlant) {
+      $searchPlant.addEventListener("keyup", function (event) {
+        clearTimeout(typingTimer);
+        const plantSearch = event.target.value;
+        let account = "";
+        if ($searchAccount) {
+          account = $searchAccount.value;
+        }
+        typingTimer = setTimeout(() => {
+          getPlants(account, plantSearch);
+        }, 400);
+      });
+    }
+
+    function hideModalPlants() {
+      modalIsOpen = false;
+      console.log("hideModalPlants");
+      $modalSelectPlant?.classList.add("hidden");
+    }
+    function showModalPlants() {
+      setTimeout(() => {
+        modalIsOpen = true;
+      }, 100);
+      console.log("showModalPlants");
+      $modalSelectPlant?.classList.remove("hidden");
+      getPlants();
+    }
+
+    function addPlantInStorage(plantId) {
+      const plantsStore = localStorage.getItem("plants") || "[]";
+      if (plantsStore) {
+        let plants = JSON.parse(plantsStore);
+        plants = plants.filter(Boolean);
+        if (plants.length >= 5) {
+          alert("You cannot add more than 5 plants");
+          hideModalPlants();
+          return;
+        }
+        const idx = plants.findIndex((plant) => plant.id == plantId);
+        if (idx >= 0) {
+          alert("This plant is already added");
+          hideModalPlants();
+          return;
+        }
+        showLoading();
+        fetch("https://backend.pdmmonitor.com/offline/points/" + plantId)
+          .then((response) => response.json())
+          .then((data) => data.data)
+          .then((data) => {
+            const plant = data[0];
+            plants.push(plant);
+            localStorage.setItem(
+              "plants",
+              JSON.stringify(plants.filter(Boolean)),
+            );
+          })
+          .finally(() => {
+            window.location.reload();
+          });
+      }
+    }
+
+    function processRows() {
+      document.querySelectorAll("tr[data-name]").forEach((tr) => {
+        tr.addEventListener("click", function () {
+          const plantId = this.getAttribute("data-name");
+          addPlantInStorage(plantId);
+        });
+      });
+    }
+
+    function getPlants(account = "", plantSearch = "") {
+      showLoading();
+      fetch(
+        "https://backend.pdmmonitor.com/offline/plants?account=" +
+          account +
+          "&plant=" +
+          plantSearch,
+      )
+        .then((response) => response.json())
+        .then((data) => data.data)
+        .then((data) => {
+          const $tbody = document.getElementById("tbody-select-plant");
+          $tbody.innerHTML = "";
+          data.forEach((plant) => {
+            const $tr = document.createElement("tr");
+            const $td1 = document.createElement("td");
+            const $td2 = document.createElement("td");
+            $tr.className = "border-b border-gray-200 cursor-pointer py-2";
+            $tr.dataset.name = plant.id;
+            $td1.className = "text-left text-sm";
+            $td2.className = "text-left text-sm";
+            $td1.textContent = plant.account.description;
+            $td2.textContent = plant.description;
+            $tr.appendChild($td1);
+            $tr.appendChild($td2);
+            $tbody.appendChild($tr);
+          });
+
+          processRows();
+        })
+        .finally(() => {
+          hideLoading();
+        });
+    }
+
+    document.addEventListener("click", (event) => {
+      // Verificar si el clic fue fuera del div
+      if (
+        modalIsOpen &&
+        $tableSelectPlant &&
+        !$tableSelectPlant.contains(event.target)
+      ) {
+        console.log("click out of modal");
+        hideModalPlants();
+      }
+    });
+
+    // Detectar tecla 'ESC'
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        // Verifica si la tecla presionada es 'Escape'
+        hideModalPlants();
+      }
+    });
+  </script>
+</div>

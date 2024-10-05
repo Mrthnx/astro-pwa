@@ -125,7 +125,7 @@
     plants.filter(Boolean).forEach((plant) => {
       const plantButton = document.createElement("button");
       plantButton.className =
-        "w-full text-left py-2 bg-blue-800 focus:outline-none text-sm hover:bg-yellow-700";
+        "w-full text-left py-2 px-1 bg-blue-800 focus:outline-none text-sm hover:bg-yellow-700";
       plantButton.dataset.name = "mplant-" + plant.id;
       plantButton.textContent = plant.description;
 
@@ -202,7 +202,7 @@
 
       const plantButtonDelete = document.createElement("button");
       plantButtonDelete.className =
-        "w-full text-left p-2 bg-red-800 focus:outline-none text-sm hover:bg-red-600 w-[20px]";
+        "text-left p-2 bg-red-800 focus:outline-none text-sm hover:bg-red-600 w-[20px]";
       plantButtonDelete.dataset.name = "bplant-" + plant.id;
       // symbol delete
       plantButtonDelete.textContent = "\u00D7";

@@ -85,7 +85,7 @@
     );
     characteristic.startNotifications();
     console.log("Notifications Started.");
-    return await characteristic.readValue();
+    characteristic.readValue();
   }
 
   async function getDecodedValue(value) {
@@ -105,7 +105,7 @@
       const service = await connectDevice(gattServer);
       console.log("Service connected:", service.uuid);
       const characteristic = await getCharacteristic(service);
-      const value = await getCharacteristicValue(characteristic);
+      getCharacteristicValue(characteristic);
 
       // activar toggle
       switchLabel.classList.remove("bg-red-500");

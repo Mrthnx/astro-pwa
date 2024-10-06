@@ -149,7 +149,7 @@
         partialDataBuffer = new ArrayBuffer(0);
         draws[eventActive + "_W"] = timeDomainData;
         localStorage.setItem("draws", JSON.stringify(draws));
-        setTimeout(drawAxios(eventActive + "_W"), 100);
+        drawAxios(eventActive + "_W"), 100;
       } else if (message === "FREQUENCY_DOMAIN") {
         console.log("Init data in frequency domain.");
         updateMessage(eventActive);
@@ -162,7 +162,7 @@
         partialDataBuffer = new ArrayBuffer(0);
         draws[eventActive + "_S"] = frequencyDomainData;
         localStorage.setItem("draws", JSON.stringify(draws));
-        setTimeout(drawAxios(eventActive + "_S"), 100);
+        drawAxios(eventActive + "_S"), 100;
         receivingData = false;
       }
     } else {

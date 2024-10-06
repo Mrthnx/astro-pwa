@@ -1,0 +1,39 @@
+<div>
+  <button
+    class="w-full rounded-full bg-green-700 hover:bg-green-800 text-white border-white border-2 px-2 py-1"
+    id="collectData">Collect Data</button
+  >
+</div>
+<script is:inline>
+  var eventActive = "NEXT_X";
+  var draws = {
+    NEXT_X_W: [],
+    NEXT_X_S: [],
+    NEXT_Y_W: [],
+    NEXT_Y_S: [],
+    NEXT_Z_W: [],
+    NEXT_Z_S: [],
+  };
+  const collectData = document.getElementById("collectData");
+  collectData.addEventListener("click", () => {
+    if (!toggle.checked) {
+      alert("Please turn on Bluetooth!");
+      return;
+    }
+    drawClear();
+    showLoading();
+    eventActive = "NEXT_X";
+    writeOnCharacteristic("NEXT_X");
+    setTimeout(() => {
+      eventActive = "NEXT_Y";
+      writeOnCharacteristic("NEXT_Y");
+      setTimeout(() => {
+        eventActive = "NEXT_Z";
+        writeOnCharacteristic("NEXT_Z");
+      }, 15000);
+    }, 15000);
+    setTimeout(() => {
+      hideLoading();
+    }, 45000);
+  });
+</script>

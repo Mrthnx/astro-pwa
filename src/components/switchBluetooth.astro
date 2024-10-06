@@ -1,0 +1,55 @@
+<div class="flex items-center">
+    <label for="toggle" class="mr-3">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="25px"
+        height="25px"
+        viewBox="0 0 24 24"
+        fill="none"
+      >
+        <path
+          d="M7 17L17 7L12 2V22L17 17L7 7"
+          stroke="#fff"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"></path>
+      </svg>
+    </label>
+    <div
+      id="switch"
+      class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in"
+    >
+      <input type="checkbox" id="toggle" class="absolute opacity-0 w-0 h-0" />
+      <label
+        for="toggle"
+        class="block overflow-hidden h-6 rounded-full cursor-pointer transition-colors duration-300 bg-red-500"
+      >
+        <span
+          class="toggle-dot absolute left-[3px] top-[4px] bg-white w-4 h-4 rounded-full transition-transform duration-300 transform"
+        ></span>
+      </label>
+    </div>
+</div>
+<script is:inline>
+  var toggle = document.getElementById("toggle");
+  var switchLabel = document.querySelector("#switch label");
+  var switchSpan = document.querySelector("#switch span");
+
+  toggle.addEventListener("change", function () {
+    if (toggle.checked) {
+      // Cambia a estado 'true'
+      if(isWebBluetoothEnabled()) {
+        connectToDevice();
+      }
+    } else {
+      // Cambia a estado 'false'
+      switchLabel.classList.remove("bg-green-500");
+      switchLabel.classList.add("bg-red-500");
+
+      switchSpan.classList.remove("right-[3px]");
+      switchSpan.classList.add("left-[3px]");
+      disconnectDevice();
+    }
+  });
+
+</script>

@@ -112,7 +112,11 @@
             );
           })
           .finally(() => {
-            window.location.reload();
+            const plantsStore = localStorage.getItem("plants") || "[]";
+            createHierarchyList(JSON.parse(plantsStore));
+            hideModalPlants();
+            hideLoading();
+            // window.location.reload();
           });
       }
     }

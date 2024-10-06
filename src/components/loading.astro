@@ -2,8 +2,9 @@
   id="loadingOverlay"
   class="fixed inset-0 flex flex-col items-center justify-center bg-black bg-opacity-50 z-50 hidden"
 >
-  <img src="corelusa.png" alt="Cargando..." class="h-24" />
-  <span class="text-white">Cargando...</span>
+  <img src="corelusa.png" alt="Loading..." class="h-24" />
+  <span id="loadingMessage" class="text-white"></span>
+  <span id="loadingSpan" class="text-white">Loading...</span>
 </div>
 <script is:inline>
   function hideLoading() {
@@ -14,4 +15,32 @@
     const $loadingOverlay = document.getElementById("loadingOverlay");
     $loadingOverlay?.classList.remove("hidden");
   }
+  function updateMessage(message) {
+    const $loadingMessage = document.getElementById("loadingMessage");
+    if ($loadingMessage) {
+      $loadingMessage.innerHTML = message;
+    }
+  }
+  function animateMessage() {
+    const $loadingMessage = document.getElementById("loadingSpan");
+    const text = $loadingMessage.innerText; // Obtiene el texto del span
+    let index = 0; // Para controlar el índice de las letras
+
+    // Función que mostrará las letras una por una
+    function showLetter() {
+      $loadingMessage.innerText = text.substring(0, index); // Mostrar hasta el índice actual
+      index++;
+
+      // Cuando todas las letras se hayan mostrado, reiniciar el índice
+      if (index > text.length) {
+        index = 0;
+      }
+    }
+
+    // Repetir la animación cada 150ms (ajusta la velocidad si es necesario)
+    setInterval(showLetter, 150);
+  }
+
+  // Llamar a la función para comenzar la animación
+  animateMessage();
 </script>

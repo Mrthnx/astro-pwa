@@ -1,8 +1,151 @@
 <div class="drawer">
-  <h1>Drawer</h1>
+  <div class="h-[520px]">
+    <div id="NEXT_X_W" class="h-[250px]"></div>
+    <div id="NEXT_X_S" class="h-[250px]"></div>
+  </div>
+  <hr />
+
+  <div class="h-[520px]">
+    <div id="NEXT_Y_W" class="h-[250px]"></div>
+    <div id="NEXT_Y_S" class="h-[250px]"></div>
+  </div>
+  <hr />
+
+  <div class="h-[520px]">
+    <div id="NEXT_Z_W" class="h-[250px]"></div>
+    <div id="NEXT_Z_S" class="h-[250px]"></div>
+  </div>
 </div>
 <script is:inline>
-  function alertDrawer() {
-    alert("drawer");
+  var CHARTS = {
+    NEXT_X_W: null,
+    NEXT_X_S: null,
+    NEXT_Y_W: null,
+    NEXT_Y_S: null,
+    NEXT_Z_W: null,
+    NEXT_Z_S: null,
+  };
+
+  const options = {
+    zoom: {
+      enableAxisDragging: false,
+      enablePanning: false,
+      enableScrolling: false,
+      enableSelecting: true,
+    },
+    title: {
+      text: "",
+    },
+    tooltip: {
+      enabled: true,
+    },
+    axes: [
+      {
+        type: "number",
+        position: "left",
+      },
+      {
+        type: "number",
+        position: "bottom",
+        nice: false,
+        label: {
+          autoRotate: true,
+        },
+      },
+    ],
+    container: "",
+    data: [],
+    series: [
+      {
+        type: "line",
+        xKey: "x",
+        yKey: "y",
+        marker: { shape: "circle", size: 0.5, strokeWidth: 1 },
+      },
+    ],
+  };
+
+  const drawTitles = {
+    NEXT_X_W: "X-axis (Waveform)",
+    NEXT_X_S: "X-axis (Spectrum)",
+    NEXT_Y_W: "Y-axis (Waveform)",
+    NEXT_Y_S: "Y-axis (Spectrum)",
+    NEXT_Z_W: "Z-axis (Waveform)",
+    NEXT_Z_S: "Z-axis (Spectrum)",
+  };
+
+  function drawAxios(eventActive) {
+    let drawsStore = localStorage.getItem("draws");
+    if (drawsStore) {
+      drawsStore = JSON.parse(drawsStore);
+      drawsStore[eventActive] = drawsStore[eventActive] || [];
+    }
+
+    if (CHARTS[eventActive]) {
+      CHARTS[eventActive].destroy();
+    }
+    if (drawsStore[eventActive] && drawsStore[eventActive].length > 0) {
+      options.title.text = drawTitles[eventActive];
+      options.container = document.getElementById(eventActive);
+      options.data = drawsStore[eventActive].map((valueY, index) => ({
+        y: valueY,
+        x: index,
+      }));
+      CHARTS[eventActive] = agCharts.AgCharts.create({ ...options });
+    }
   }
+
+  function drawClear() {
+    if (CHARTS["NEXT_X_W"]) {
+      CHARTS["NEXT_X_W"].destroy();
+      CHARTS["NEXT_X_W"] = null;
+    }
+    if (CHARTS["NEXT_X_S"]) {
+      CHARTS["NEXT_X_S"].destroy();
+      CHARTS["NEXT_X_S"] = null;
+    }
+    if (CHARTS["NEXT_Y_W"]) {
+      CHARTS["NEXT_Y_W"].destroy();
+      CHARTS["NEXT_Y_W"] = null;
+    }
+    if (CHARTS["NEXT_Y_S"]) {
+      CHARTS["NEXT_Y_S"].destroy();
+      CHARTS["NEXT_Y_S"] = null;
+    }
+    if (CHARTS["NEXT_Z_W"]) {
+      CHARTS["NEXT_Z_W"].destroy();
+      CHARTS["NEXT_Z_W"] = null;
+    }
+    if (CHARTS["NEXT_Z_S"]) {
+      CHARTS["NEXT_Z_S"].destroy();
+      CHARTS["NEXT_Z_S"] = null;
+    }
+  }
+
+  function drawIfExists() {
+    let drawsStore = localStorage.getItem("draws");
+    if (drawsStore) {
+      drawsStore = JSON.parse(drawsStore);
+      if (drawsStore["NEXT_X_W"] && drawsStore["NEXT_X_W"].length > 0) {
+        drawAxios("NEXT_X_W");
+      }
+      if (drawsStore["NEXT_X_S"] && drawsStore["NEXT_X_S"].length > 0) {
+        drawAxios("NEXT_X_S");
+      }
+      if (drawsStore["NEXT_Y_W"] && drawsStore["NEXT_Y_W"].length > 0) {
+        drawAxios("NEXT_Y_W");
+      }
+      if (drawsStore["NEXT_Y_S"] && drawsStore["NEXT_Y_S"].length > 0) {
+        drawAxios("NEXT_Y_S");
+      }
+      if (drawsStore["NEXT_Z_W"] && drawsStore["NEXT_Z_W"].length > 0) {
+        drawAxios("NEXT_Z_W");
+      }
+      if (drawsStore["NEXT_Z_S"] && drawsStore["NEXT_Z_S"].length > 0) {
+        drawAxios("NEXT_Z_S");
+      }
+    }
+  }
+
+  drawIfExists();
 </script>

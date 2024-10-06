@@ -1,5 +1,6 @@
 ---
-
+import SwitchBluetooth from './switchBluetooth.astro';
+import ButtonCollectData from './buttonCollectData.astro';
 ---
 
 <!-- Navbar -->
@@ -7,6 +8,8 @@
   class="bg-blue-900 p-4 flex justify-between items-center top-0 left-0 w-full z-10"
 >
   <div class="hidden md:block text-white text-2xl">PDM Monitor</div>
+  <SwitchBluetooth />
+  <ButtonCollectData />
   <div class="flex gap-8">
     <button id="menu-button" class="text-white focus:outline-none">
       <svg
@@ -67,7 +70,6 @@
 
   document.addEventListener("click", (event) => {
     // Verificar si el clic fue fuera del div
-    console.log(sidebarIsOpen);
     if (
       !sidebar.contains(event.target) &&
       !menuButton.contains(event.target) &&
@@ -88,18 +90,24 @@
   });
 
   function removePlant(id) {
-    const plantId = id.split("-")[1];
-    const plantsStore = localStorage.getItem("plants") || "[]";
-    if (plantsStore) {
-      let plants = JSON.parse(plantsStore);
-      plants = plants.filter(Boolean);
-      const idx = plants.findIndex((plant) => plant.id == plantId);
-      if (idx >= 0) {
-        plants.splice(idx, 1);
-        localStorage.setItem("plants", JSON.stringify(plants.filter(Boolean)));
+    if (isStatusOnline) {
+      const plantId = id.split("-")[1];
+      const plantsStore = localStorage.getItem("plants") || "[]";
+      if (plantsStore) {
+        let plants = JSON.parse(plantsStore);
+        plants = plants.filter(Boolean);
+        const idx = plants.findIndex((plant) => plant.id == plantId);
+        if (idx >= 0) {
+          plants.splice(idx, 1);
+          localStorage.setItem(
+            "plants",
+            JSON.stringify(plants.filter(Boolean)),
+          );
+          createHierarchyList(plants.filter(Boolean));
+        }
       }
+      // window.location.reload();
     }
-    window.location.reload();
   }
 
   // Añadir el evento de click a cada botón
@@ -141,6 +149,7 @@
   // Función para cargar los datos de los menús
   function createHierarchyList(plants) {
     const container = document.getElementById("plants-container");
+    container.innerHTML = "";
     plants.filter(Boolean).forEach((plant) => {
       const plantButton = document.createElement("button");
       plantButton.className =

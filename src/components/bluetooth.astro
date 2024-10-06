@@ -52,7 +52,9 @@
   }
 
   async function requestDevice() {
-    return await navigator.bluetooth.requestDevice();
+    return await navigator.bluetooth.requestDevice({
+      acceptAllDevices: true
+    });
   }
 
   async function selectDevice(device) {

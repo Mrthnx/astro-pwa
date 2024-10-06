@@ -1,5 +1,4 @@
 <script is:inline>
-  
   // DOM Elements
   const bleStateContainer = document.getElementById("bleState");
 
@@ -140,7 +139,7 @@
     if (message && markers.includes(message)) {
       if (message === "TIME_DOMAIN") {
         console.log("Init data in time domain.");
-        updateMessage(eventActive)
+        updateMessage(eventActive);
         currentDataType = "time_domain";
         timeDomainData = [];
         partialDataBuffer = new ArrayBuffer(0);
@@ -148,12 +147,12 @@
         console.log("End data in time domain.");
         currentDataType = null;
         partialDataBuffer = new ArrayBuffer(0);
-        draws[eventActive+"_W"] = timeDomainData;
+        draws[eventActive + "_W"] = timeDomainData;
         localStorage.setItem("draws", JSON.stringify(draws));
-        setTimeout(drawAxios(eventActive+"_W"), 100);
+        setTimeout(drawAxios(eventActive + "_W"), 100);
       } else if (message === "FREQUENCY_DOMAIN") {
         console.log("Init data in frequency domain.");
-        updateMessage(eventActive)
+        updateMessage(eventActive);
         currentDataType = "frequency_domain";
         frequencyDomainData = [];
         partialDataBuffer = new ArrayBuffer(0);
@@ -161,11 +160,9 @@
         console.log("End data in frequency domain.");
         currentDataType = null;
         partialDataBuffer = new ArrayBuffer(0);
-        draws[eventActive+"_S"] = frequencyDomainData;
+        draws[eventActive + "_S"] = frequencyDomainData;
         localStorage.setItem("draws", JSON.stringify(draws));
-        if (draws[eventActive+"_S"] && draws[eventActive+"_S"].length > 0) {
-         ssetTimeout(drawAxios(eventActive+"_S"), 100);
-        }
+        setTimeout(drawAxios(eventActive + "_S"), 100);
         receivingData = false;
       }
     } else {
@@ -213,12 +210,8 @@
           console.error("Error writing to the Data characteristic: ", error);
         });
     } else {
-      console.error(
-        "Bluetooth is not connected.",
-      );
-      window.alert(
-        "Bluetooth is not connected.",
-      );
+      console.error("Bluetooth is not connected.");
+      window.alert("Bluetooth is not connected.");
     }
   }
 

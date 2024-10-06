@@ -53,7 +53,8 @@
 
   async function requestDevice() {
     return await navigator.bluetooth.requestDevice({
-      acceptAllDevices: true
+      filters: [{ name: deviceName }],
+      optionalServices: [bleService],
     });
   }
 

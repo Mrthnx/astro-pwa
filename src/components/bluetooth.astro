@@ -52,10 +52,7 @@
   }
 
   async function requestDevice() {
-    return await navigator.bluetooth.requestDevice({
-      filters: [{ name: deviceName }],
-      optionalServices: [bleService],
-    });
+    return await navigator.bluetooth.requestDevice();
   }
 
   async function selectDevice(device) {

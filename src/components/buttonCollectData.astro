@@ -5,8 +5,17 @@
   >
 </div>
 <script is:inline>
-  var eventActive = "NEXT_X";
-  var draws = {
+  let mawoisWithCollectData = [];
+  let mawoiWithCollectData = {
+    id: null,
+    code: null,
+    description: null,
+    pointLength: 0,
+    points: [],
+  };
+  let pointWithCollectData = {
+    id: null,
+    date: null,
     NEXT_X_W: [],
     NEXT_X_S: [],
     NEXT_Y_W: [],
@@ -14,14 +23,47 @@
     NEXT_Z_W: [],
     NEXT_Z_S: [],
   };
+  var eventActive = "NEXT_X";
   const collectData = document.getElementById("collectData");
   collectData.addEventListener("click", () => {
+    mawoisWithCollectData =
+      localStorage.getItem("mawoisWithCollectData") || "[]";
+    mawoisWithCollectData = JSON.parse(mawoisWithCollectData);
+
     if (!toggle.checked) {
       alert("Please turn on Bluetooth!");
       return;
     }
+    if (MAWOI_SELECTED == null) {
+      alert("Please select a mawoi!");
+      return;
+    }
     drawClear();
     showLoading();
+    let mawoiStore = localStorage.getItem("mawoiSelected");
+    mawoiStore = JSON.parse(mawoiStore);
+
+    let idxMawoi = -1;
+    if (mawoisWithCollectData && mawoisWithCollectData.length > 0) {
+      idxMawoi = mawoisWithCollectData.findIndex(
+        (mawoi) => mawoi.id === mawoiStore.id,
+      );
+    }
+
+    if (idxMawoi >= 0) {
+      mawoiWithCollectData = mawoisWithCollectData[idxMawoi];
+    } else {
+      mawoiWithCollectData.id = MAWOI_SELECTED.id;
+      mawoiWithCollectData.code = MAWOI_SELECTED.code;
+      mawoiWithCollectData.description = MAWOI_SELECTED.description;
+      mawoiWithCollectData.pointLength = MAWOI_SELECTED.points.length;
+      mawoiWithCollectData.points = [];
+    }
+
+    const pointSelect = document.getElementById("point-select");
+    pointWithCollectData.id = pointSelect.value;
+    pointWithCollectData.date = new Date().getTime();
+
     eventActive = "NEXT_X";
     writeOnCharacteristic("NEXT_X");
     setTimeout(() => {
@@ -33,6 +75,16 @@
       }, 18000);
     }, 18000);
     setTimeout(() => {
+      mawoiWithCollectData.points.push({ ...pointWithCollectData });
+      if (idxMawoi >= 0) {
+        mawoisWithCollectData[idxMawoi] = { ...mawoiWithCollectData };
+      } else {
+        mawoisWithCollectData.push({ ...mawoiWithCollectData });
+      }
+      localStorage.setItem(
+        "mawoisWithCollectData",
+        JSON.stringify(mawoisWithCollectData),
+      );
       hideLoading();
     }, 54000);
   });

@@ -1,4 +1,12 @@
 <div class="drawer">
+  <div class="flex justify-between items-center p-2">
+    <!-- name mawoi in h2 --->
+    <h2 id="mawoi-name" class="text-lg font-bold w-1/2"></h2>
+    <span id="date-collect" class="text-sm"></span>
+    <div>
+      <select id="point-select" class="w-full"> </select>
+    </div>
+  </div>
   <div class="h-[520px]">
     <div id="NEXT_X_W" class="h-[250px]"></div>
     <div id="NEXT_X_S" class="h-[250px]"></div>
@@ -17,6 +25,8 @@
   </div>
 </div>
 <script is:inline>
+  var MAWOI_SELECTED = null;
+
   var CHARTS = {
     NEXT_X_W: null,
     NEXT_X_S: null,
@@ -75,9 +85,8 @@
   };
 
   function drawAxios(eventActive) {
-    let drawsStore = localStorage.getItem("draws");
+    let drawsStore = pointWithCollectData;
     if (drawsStore) {
-      drawsStore = JSON.parse(drawsStore);
       drawsStore[eventActive] = drawsStore[eventActive] || [];
     }
 
@@ -122,30 +131,62 @@
     }
   }
 
-  function drawIfExists() {
-    let drawsStore = localStorage.getItem("draws");
-    if (drawsStore) {
-      drawsStore = JSON.parse(drawsStore);
-      if (drawsStore["NEXT_X_W"] && drawsStore["NEXT_X_W"].length > 0) {
-        drawAxios("NEXT_X_W");
+  // function drawIfExists() {
+  //   let drawsStore = localStorage.getItem("draws");
+  //   if (drawsStore) {
+  //     drawsStore = JSON.parse(drawsStore);
+  //     if (drawsStore["NEXT_X_W"] && drawsStore["NEXT_X_W"].length > 0) {
+  //       drawAxios("NEXT_X_W");
+  //     }
+  //     if (drawsStore["NEXT_X_S"] && drawsStore["NEXT_X_S"].length > 0) {
+  //       drawAxios("NEXT_X_S");
+  //     }
+  //     if (drawsStore["NEXT_Y_W"] && drawsStore["NEXT_Y_W"].length > 0) {
+  //       drawAxios("NEXT_Y_W");
+  //     }
+  //     if (drawsStore["NEXT_Y_S"] && drawsStore["NEXT_Y_S"].length > 0) {
+  //       drawAxios("NEXT_Y_S");
+  //     }
+  //     if (drawsStore["NEXT_Z_W"] && drawsStore["NEXT_Z_W"].length > 0) {
+  //       drawAxios("NEXT_Z_W");
+  //     }
+  //     if (drawsStore["NEXT_Z_S"] && drawsStore["NEXT_Z_S"].length > 0) {
+  //       drawAxios("NEXT_Z_S");
+  //     }
+  //   }
+  // }
+
+  function setInformationMawoi({ code, description, id, points }) {
+    MAWOI_SELECTED = {
+      code,
+      description,
+      id,
+      points,
+    };
+    const mawoiName = document.getElementById("mawoi-name");
+    mawoiName.textContent = description;
+    const dateCollect = document.getElementById("date-collect");
+    dateCollect.innerHTML = new Date().toLocaleString().replace(",", "<br>");
+    const pointSelect = document.getElementById("point-select");
+    pointSelect.innerHTML = "";
+    const pointsCode = points.reduce((acc, point) => {
+      const codePoint = point.code.split("").slice(0, 2).join("");
+      const idx = acc.findIndex((p) => p.code === codePoint);
+      if (idx < 0) {
+        acc.push({
+          id: point.id,
+          code: codePoint,
+        });
       }
-      if (drawsStore["NEXT_X_S"] && drawsStore["NEXT_X_S"].length > 0) {
-        drawAxios("NEXT_X_S");
-      }
-      if (drawsStore["NEXT_Y_W"] && drawsStore["NEXT_Y_W"].length > 0) {
-        drawAxios("NEXT_Y_W");
-      }
-      if (drawsStore["NEXT_Y_S"] && drawsStore["NEXT_Y_S"].length > 0) {
-        drawAxios("NEXT_Y_S");
-      }
-      if (drawsStore["NEXT_Z_W"] && drawsStore["NEXT_Z_W"].length > 0) {
-        drawAxios("NEXT_Z_W");
-      }
-      if (drawsStore["NEXT_Z_S"] && drawsStore["NEXT_Z_S"].length > 0) {
-        drawAxios("NEXT_Z_S");
-      }
-    }
+      return acc;
+    }, []);
+    pointsCode.forEach((point) => {
+      const option = document.createElement("option");
+      option.value = point.id;
+      option.text = point.code;
+      pointSelect.appendChild(option);
+    });
   }
 
-  drawIfExists();
+  // drawIfExists();
 </script>

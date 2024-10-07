@@ -1,15 +1,12 @@
 ---
-import SwitchBluetooth from './switchBluetooth.astro';
-import ButtonCollectData from './buttonCollectData.astro';
+import SwitchBluetooth from "./switchBluetooth.astro";
+import ButtonCollectData from "./buttonCollectData.astro";
 ---
 
 <!-- Navbar -->
 <nav
   class="bg-blue-900 p-4 flex justify-between items-center top-0 left-0 w-full z-10"
 >
-  <div class="hidden md:block text-white text-2xl">PDM Monitor</div>
-  <SwitchBluetooth />
-  <ButtonCollectData />
   <div class="flex gap-8">
     <button id="menu-button" class="text-white focus:outline-none">
       <svg
@@ -26,7 +23,10 @@ import ButtonCollectData from './buttonCollectData.astro';
           d="M4 6h16M4 12h16m-7 6h7"></path>
       </svg>
     </button>
+    <div class="hidden md:block text-white text-2xl">PDM Monitor</div>
   </div>
+  <ButtonCollectData />
+  <SwitchBluetooth />
 </nav>
 <div class="flex">
   <!-- Sidebar -->
@@ -110,6 +110,23 @@ import ButtonCollectData from './buttonCollectData.astro';
     }
   }
 
+  function findMawoiForCollectData(id) {
+    let plantsStore = localStorage.getItem("plants") || "[]";
+    plantsStore = JSON.parse(plantsStore);
+    for (let plant of plantsStore) {
+      for (let area of plant.areas) {
+        for (let system of area.systems) {
+          for (let mawoi of system.mawois) {
+            if (mawoi.id == id) {
+              return mawoi; // Termina la función si encuentra el mawoi
+            }
+          }
+        }
+      }
+    }
+    return null;
+  }
+
   // Añadir el evento de click a cada botón
   function forEachButtonSidebar() {
     document.querySelectorAll("button[data-name]").forEach((button) => {
@@ -119,6 +136,17 @@ import ButtonCollectData from './buttonCollectData.astro';
           removePlant(hierarchyName);
         } else {
           toggleMenu(hierarchyName);
+          if (hierarchyName.startsWith("mmawoi")) {
+            const mawoiSelected = findMawoiForCollectData(
+              +hierarchyName.split("-")[1],
+            );
+            localStorage.setItem(
+              "mawoiSelected",
+              JSON.stringify(mawoiSelected),
+            );
+            setInformationMawoi(mawoiSelected);
+            sidebar.classList.toggle("sidebar-open");
+          }
         }
       });
     });
@@ -153,9 +181,18 @@ import ButtonCollectData from './buttonCollectData.astro';
     plants.filter(Boolean).forEach((plant) => {
       const plantButton = document.createElement("button");
       plantButton.className =
-        "w-full text-left py-2 px-1 bg-blue-800 focus:outline-none text-sm hover:bg-yellow-700";
+        "w-full text-left py-2 px-1 bg-blue-800 focus:outline-none text-xs hover:bg-yellow-700";
       plantButton.dataset.name = "mplant-" + plant.id;
       plantButton.textContent = plant.description;
+
+      // Crear el elemento img
+      const plantImage = document.createElement("img");
+      plantImage.src = "/icons/plant.png"; // Ruta de la imagen
+      plantImage.alt = "icons plant"; // Texto alternativo
+      plantImage.className = "w-6 h-6 mr-2 inline-block"; // Estilo de la imagen
+
+      // Insertar la imagen antes del texto en el botón
+      plantButton.prepend(plantImage);
 
       const areaList = document.createElement("ul");
       areaList.id = "mplant-" + plant.id;
@@ -166,9 +203,18 @@ import ButtonCollectData from './buttonCollectData.astro';
 
         const areaButton = document.createElement("button");
         areaButton.className =
-          "w-full text-left p-1 pl-2 bg-blue-700 focus:outline-none text-sm hover:bg-yellow-700";
+          "w-full text-left p-1 pl-2 bg-blue-700 focus:outline-none text-xs hover:bg-yellow-700";
         areaButton.dataset.name = "marea-" + area.id;
         areaButton.textContent = area.description;
+
+        // Crear el elemento img
+        const areaImage = document.createElement("img");
+        areaImage.src = "/icons/area.png"; // Ruta de la imagen
+        areaImage.alt = "icons area"; // Texto alternativo
+        areaImage.className = "w-6 h-6 mr-2 inline-block"; // Estilo de la imagen
+
+        // Insertar la imagen antes del texto en el botón
+        areaButton.prepend(areaImage);
 
         const systemList = document.createElement("ul");
         systemList.id = "marea-" + area.id;
@@ -179,9 +225,18 @@ import ButtonCollectData from './buttonCollectData.astro';
 
           const systemButton = document.createElement("button");
           systemButton.className =
-            "w-full text-left p-1 pl-3 bg-blue-600 focus:outline-none text-sm hover:bg-yellow-700";
+            "w-full text-left p-1 pl-3 bg-blue-600 focus:outline-none text-xs hover:bg-yellow-700";
           systemButton.dataset.name = "msystem-" + system.id;
           systemButton.textContent = system.description;
+
+          // Crear el elemento img
+          const systemImage = document.createElement("img");
+          systemImage.src = "/icons/system.png"; // Ruta de la imagen
+          systemImage.alt = "icons system"; // Texto alternativo
+          systemImage.className = "w-6 h-6 mr-2 inline-block"; // Estilo de la imagen
+
+          // Insertar la imagen antes del texto en el botón
+          systemButton.prepend(systemImage);
 
           const mawoiList = document.createElement("ul");
           mawoiList.id = "msystem-" + system.id;
@@ -191,28 +246,20 @@ import ButtonCollectData from './buttonCollectData.astro';
             const mawoiLi = document.createElement("li");
             const mawoiButton = document.createElement("button");
             mawoiButton.className =
-              "w-full text-left p-1 pl-4 bg-blue-500 focus:outline-none text-sm hover:bg-yellow-700";
+              "w-full text-left p-1 pl-4 bg-blue-500 focus:outline-none text-xs hover:bg-yellow-700";
             mawoiButton.dataset.name = "mmawoi-" + mawoi.id;
             mawoiButton.textContent = mawoi.description;
 
-            const pointList = document.createElement("ul");
-            pointList.id = "mmawoi-" + mawoi.id;
-            pointList.className = "hidden"; // Oculto inicialmente
+            // Crear el elemento img
+            const mawoiImage = document.createElement("img");
+            mawoiImage.src = "/icons/mawoi.png"; // Ruta de la imagen
+            mawoiImage.alt = "icons mawoi"; // Texto alternativo
+            mawoiImage.className = "w-6 h-6 mr-2 inline-block"; // Estilo de la imagen
 
-            mawoi.points.forEach((point) => {
-              const pointLi = document.createElement("li");
-              pointLi.className = "p-1 bg-blue-800 text-xs hover:bg-yellow-700";
-
-              const pointSpan = document.createElement("span");
-              pointSpan.className = "p-2 pl-5";
-              pointSpan.textContent = point.description;
-
-              pointLi.appendChild(pointSpan);
-              pointList.appendChild(pointLi);
-            });
+            // Insertar la imagen antes del texto en el botón
+            mawoiButton.prepend(mawoiImage);
 
             mawoiLi.appendChild(mawoiButton);
-            mawoiLi.appendChild(pointList);
             mawoiList.appendChild(mawoiLi);
           });
 

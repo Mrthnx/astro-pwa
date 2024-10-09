@@ -71,14 +71,12 @@
 
     function hideModalPlants() {
       modalIsOpen = false;
-      console.log("hideModalPlants");
       $modalSelectPlant?.classList.add("hidden");
     }
     function showModalPlants() {
       setTimeout(() => {
         modalIsOpen = true;
       }, 100);
-      console.log("showModalPlants");
       $modalSelectPlant?.classList.remove("hidden");
       getPlants();
     }
@@ -110,6 +108,16 @@
               "plants",
               JSON.stringify(plants.filter(Boolean)),
             );
+            return plant;
+          })
+          .then(async (plant) => {
+            for (let area of plant.areas) {
+              for (let system of area.systems) {
+                for (let mawoi of system.mawois) {
+                  await downloadAndSaveImages(mawoi.id, mawoi.images);
+                }
+              }
+            }
           })
           .finally(() => {
             const plantsStore = localStorage.getItem("plants") || "[]";
@@ -184,5 +192,65 @@
         hideModalPlants();
       }
     });
+
+    function openDatabase() {
+      return new Promise((resolve, reject) => {
+        const request = indexedDB.open("imageDatabase", 1);
+
+        request.onupgradeneeded = function (event) {
+          const db = event.target.result;
+          if (!db.objectStoreNames.contains("images")) {
+            db.createObjectStore("images", { keyPath: "id" });
+          }
+        };
+
+        request.onsuccess = function (event) {
+          resolve(event.target.result);
+        };
+
+        request.onerror = function (event) {
+          reject("Error opening database:", event.target.errorCode);
+        };
+      });
+    }
+
+    function saveImageToIndexedDB(db, id, images) {
+      return new Promise((resolve, reject) => {
+        const transaction = db.transaction(["images"], "readwrite");
+        const store = transaction.objectStore("images");
+
+        const request = store.put({ id, images });
+
+        request.onsuccess = function () {
+          resolve(`Image saved successfully ${id}`);
+        };
+
+        request.onerror = function (event) {
+          reject(`Error saving image: ${id} - ${event.target.errorCode}`);
+        };
+      });
+    }
+
+    async function fetchImage(url) {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch image: ${url}`);
+      }
+      return await response.blob(); // Convertir la imagen a Blob
+    }
+
+    async function downloadAndSaveImages(id, urls) {
+      const db = await openDatabase(); // Abrir la base de datos
+      try {
+        const images = [];
+        for (let url of urls) {
+          const blob = await fetchImage(url);
+          images.push(blob);
+        }
+        await saveImageToIndexedDB(db, id, images); // Guardar en IndexedDB
+      } catch (error) {
+        console.error(error);
+      }
+    }
   </script>
 </div>

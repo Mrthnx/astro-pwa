@@ -1,10 +1,23 @@
-<div class="drawer">
-  <div class="flex justify-between items-center p-2">
+<div class="drawer pt-2">
+  <div class="flex justify-around items-center p-2 flex-wrap gap-1 w-full">
     <!-- name mawoi in h2 --->
-    <h2 id="mawoi-name" class="text-lg font-bold w-1/2"></h2>
-    <span id="date-collect" class="text-sm"></span>
-    <div>
-      <select id="point-select" class="w-full"> </select>
+    <div class="w-[250px]">
+      <select id="mawoi-select"></select>
+    </div>
+    <div class="w-[80px]">
+      <select id="point-select"></select>
+    </div>
+    <div class="w-[180px]">
+      <select id="date-collect"></select>
+    </div>
+    <div class="w-[150px]">
+      <button
+        id="button-picture"
+        class="flex bg-blue-800 hover:bg-blue-900 text-white py-1 px-2 rounded-full"
+      >
+        <span class="px-2">Find</span>
+        <img src="/icons/pictures.svg" alt="find pictures" class="w-6" />
+      </button>
     </div>
   </div>
   <div class="h-[520px]">
@@ -24,6 +37,14 @@
     <div id="NEXT_Z_S" class="h-[250px]"></div>
   </div>
 </div>
+<style>
+  select {
+    @apply w-full rounded-full py-1 px-3 cursor-pointer bg-blue-800 hover:bg-blue-900 text-white mb-1;
+    option {
+      @apply bg-blue-500 text-sm text-white cursor-pointer hover:bg-blue-700;
+    }
+  }
+</style>
 <script is:inline>
   var MAWOI_SELECTED = null;
 
@@ -37,12 +58,6 @@
   };
 
   const options = {
-    // zoom: {
-    //   enableAxisDragging: false,
-    //   enablePanning: false,
-    //   enableScrolling: false,
-    //   enableSelecting: true,
-    // },
     title: {
       text: "",
     },
@@ -84,8 +99,8 @@
     NEXT_Z_S: "Z-axis (Spectrum)",
   };
 
-  function drawAxios(eventActive) {
-    let drawsStore = pointWithCollectData;
+  function drawAxios(eventActive, pointTemp = null) {
+    let drawsStore = pointTemp || pointWithCollectData;
     if (drawsStore) {
       drawsStore[eventActive] = drawsStore[eventActive] || [];
     }
@@ -131,42 +146,33 @@
     }
   }
 
-  // function drawIfExists() {
-  //   let drawsStore = localStorage.getItem("draws");
-  //   if (drawsStore) {
-  //     drawsStore = JSON.parse(drawsStore);
-  //     if (drawsStore["NEXT_X_W"] && drawsStore["NEXT_X_W"].length > 0) {
-  //       drawAxios("NEXT_X_W");
-  //     }
-  //     if (drawsStore["NEXT_X_S"] && drawsStore["NEXT_X_S"].length > 0) {
-  //       drawAxios("NEXT_X_S");
-  //     }
-  //     if (drawsStore["NEXT_Y_W"] && drawsStore["NEXT_Y_W"].length > 0) {
-  //       drawAxios("NEXT_Y_W");
-  //     }
-  //     if (drawsStore["NEXT_Y_S"] && drawsStore["NEXT_Y_S"].length > 0) {
-  //       drawAxios("NEXT_Y_S");
-  //     }
-  //     if (drawsStore["NEXT_Z_W"] && drawsStore["NEXT_Z_W"].length > 0) {
-  //       drawAxios("NEXT_Z_W");
-  //     }
-  //     if (drawsStore["NEXT_Z_S"] && drawsStore["NEXT_Z_S"].length > 0) {
-  //       drawAxios("NEXT_Z_S");
-  //     }
-  //   }
-  // }
-
-  function setInformationMawoi({ code, description, id, points }) {
+  function setInformationMawoi({ code, description, id, points }, system) {
     MAWOI_SELECTED = {
       code,
       description,
       id,
       points,
     };
-    const mawoiName = document.getElementById("mawoi-name");
-    mawoiName.textContent = description;
-    const dateCollect = document.getElementById("date-collect");
-    dateCollect.innerHTML = new Date().toLocaleString().replace(",", "<br>");
+    const mawoiSelect = document.getElementById("mawoi-select");
+    mawoiSelect.innerHTML = "";
+    const mawoisCode = system.mawois.reduce((acc, mawoi) => {
+      const idx = acc.findIndex((p) => p.id === mawoi.id);
+      if (idx < 0) {
+        acc.push({
+          id: mawoi.id,
+          code: mawoi.description,
+        });
+      }
+      return acc;
+    }, []);
+    mawoisCode.forEach((mawoi) => {
+      const option = document.createElement("option");
+      option.value = mawoi.id;
+      option.text = mawoi.code;
+      option.selected = mawoi.id == id;
+      mawoiSelect.appendChild(option);
+    });
+
     const pointSelect = document.getElementById("point-select");
     pointSelect.innerHTML = "";
     const pointsCode = points.reduce((acc, point) => {
@@ -186,7 +192,137 @@
       option.text = point.code;
       pointSelect.appendChild(option);
     });
+    const pointIdDefault = pointsCode[0].id;
+    drawByPointId(pointIdDefault);
+
+    setDateByMawoiId(id, pointIdDefault);
   }
 
-  // drawIfExists();
+  const pointSelect = document.getElementById("point-select");
+
+  pointSelect.addEventListener("change", () => {
+    const pointId = pointSelect.value;
+    drawByPointId(pointId);
+    setDateByMawoiId(MAWOI_SELECTED.id, pointId);
+  });
+
+  const mawoiSelect = document.getElementById("mawoi-select");
+  mawoiSelect.addEventListener("change", () => {
+    const mawoiId = mawoiSelect.value;
+    const mawoiFind = findMawoiForCollectData(mawoiId);
+    localStorage.setItem("mawoiSelected", JSON.stringify(mawoiFind.mawoi));
+    window.location.reload();
+  });
+
+  const dateSelect = document.getElementById("date-collect");
+  dateSelect.addEventListener("change", () => {
+    const date = dateSelect.value;
+    drawByPointId(pointSelect.value, date);
+  });
+
+  function setDateByMawoiId(id, pointIdDefault) {
+    const dateCollect = document.getElementById("date-collect");
+    dateCollect.innerHTML = "";
+    let mawoisWithData = localStorage.getItem("mawoisWithCollectData") || "[]";
+    mawoisWithData = JSON.parse(mawoisWithData);
+    const mawoiStore = mawoisWithData.find((mawoi) => mawoi.id == id);
+    if (mawoiStore) {
+      const dates = mawoiStore.points
+        .filter((point) => point.id == pointIdDefault)
+        .map((point) => point.date);
+      if (dates && dates.length > 0) {
+        dates
+          .sort((a, b) => b - a)
+          .forEach((date) => {
+            const option = document.createElement("option");
+            option.value = date;
+            option.text = formatDate(new Date(date));
+            dateCollect.appendChild(option);
+          });
+      } else {
+        const option = document.createElement("option");
+        option.value = null;
+        option.text = formatDate(new Date());
+        dateCollect.appendChild(option);
+      }
+    } else {
+      const option = document.createElement("option");
+      option.value = null;
+      option.text = formatDate(new Date());
+      dateCollect.appendChild(option);
+    }
+  }
+
+  function drawByPointId(pointId, date) {
+    let mawoisStore = localStorage.getItem("mawoisWithCollectData") || "[]";
+    mawoisStore = JSON.parse(mawoisStore);
+    if (mawoisStore && mawoisStore.length > 0) {
+      const mawoiStore = mawoisStore.find(
+        (mawoi) => mawoi.id == MAWOI_SELECTED.id,
+      );
+      if (mawoiStore) {
+        const pointStore = mawoiStore.points
+          .sort((a, b) => b.date - a.date)
+          .find((point) => {
+            return point.id == pointId && (date ? point.date == date : true);
+          });
+        if (pointStore) {
+          showLoading();
+          drawClear();
+          drawAxios("NEXT_X_W", pointStore);
+          setTimeout(() => {
+            drawAxios("NEXT_X_S", pointStore);
+            setTimeout(() => {
+              drawAxios("NEXT_Y_W", pointStore);
+              setTimeout(() => {
+                drawAxios("NEXT_Y_S", pointStore);
+                setTimeout(() => {
+                  drawAxios("NEXT_Z_W", pointStore);
+                  setTimeout(() => {
+                    drawAxios("NEXT_Z_S", pointStore);
+                    hideLoading();
+                  }, 500);
+                }, 400);
+              }, 300);
+            }, 200);
+          }, 100);
+        } else {
+          drawClear();
+        }
+      } else {
+        drawClear();
+      }
+    }
+  }
+
+  function drawIfExists() {
+    let mawoiSelectedStore = localStorage.getItem("mawoiSelected") || null;
+    if (mawoiSelectedStore) {
+      mawoiSelectedStore = JSON.parse(mawoiSelectedStore);
+      if (mawoiSelectedStore) {
+        MAWOI_SELECTED = mawoiSelectedStore;
+        const hierarchy = findMawoiForCollectData(MAWOI_SELECTED.id);
+        if (hierarchy && hierarchy.system) {
+          setInformationMawoi(MAWOI_SELECTED, hierarchy.system);
+        }
+      }
+    }
+  }
+
+  function formatDate(date) {
+    const day = String(date.getDate()).padStart(2, "0"); // Día con 2 dígitos
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // Mes con 2 dígitos (getMonth() empieza en 0)
+    const year = String(date.getFullYear()).slice(-2); // Tomamos solo los últimos 2 dígitos del año
+    const hours = String(date.getHours()).padStart(2, "0"); // Horas con 2 dígitos
+    const minutes = String(date.getMinutes()).padStart(2, "0"); // Minutos con 2 dígitos
+
+    return `${day}/${month}/${year} ${hours}:${minutes}`;
+  }
+
+  drawIfExists();
+
+  const $buttonPicture = document.getElementById("button-picture");
+  $buttonPicture.addEventListener("click", () => {
+    showModalPictures();
+  });
 </script>

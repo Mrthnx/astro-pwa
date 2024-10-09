@@ -118,7 +118,10 @@ import ButtonCollectData from "./buttonCollectData.astro";
         for (let system of area.systems) {
           for (let mawoi of system.mawois) {
             if (mawoi.id == id) {
-              return mawoi; // Termina la función si encuentra el mawoi
+              return {
+                mawoi,
+                system,
+              }; // Termina la función si encuentra el mawoi
             }
           }
         }
@@ -137,14 +140,14 @@ import ButtonCollectData from "./buttonCollectData.astro";
         } else {
           toggleMenu(hierarchyName);
           if (hierarchyName.startsWith("mmawoi")) {
-            const mawoiSelected = findMawoiForCollectData(
+            const { mawoi: mawoiSelected, system } = findMawoiForCollectData(
               +hierarchyName.split("-")[1],
             );
             localStorage.setItem(
               "mawoiSelected",
               JSON.stringify(mawoiSelected),
             );
-            setInformationMawoi(mawoiSelected);
+            setInformationMawoi(mawoiSelected, system);
             sidebar.classList.toggle("sidebar-open");
           }
         }
@@ -172,6 +175,28 @@ import ButtonCollectData from "./buttonCollectData.astro";
       // Alternar el menú actual
       menu.classList.toggle("hidden");
     }
+  }
+
+  function existMawoiInMemory(mawoiId) {
+    let mawoiSelectedStore =
+      localStorage.getItem("mawoisWithCollectData") || "[]";
+    mawoiSelectedStore = JSON.parse(mawoiSelectedStore);
+    if (mawoiSelectedStore && mawoiSelectedStore.length > 0) {
+      const mawoiSelect = mawoiSelectedStore.find(
+        (mawoi) => mawoi.id == mawoiId,
+      );
+      if (mawoiSelect) {
+        // filter distinct points  between
+        const pointsDistinct = [
+          ...new Set(mawoiSelect.points.map((point) => point.id)),
+        ];
+        if (mawoiSelect.pointLength <= pointsDistinct.length) {
+          return 2;
+        }
+        return 1;
+      }
+    }
+    return 0;
   }
 
   // Función para cargar los datos de los menús
@@ -242,26 +267,48 @@ import ButtonCollectData from "./buttonCollectData.astro";
           mawoiList.id = "msystem-" + system.id;
           mawoiList.className = "hidden"; // Oculto inicialmente
 
-          system.mawois.forEach((mawoi) => {
-            const mawoiLi = document.createElement("li");
-            const mawoiButton = document.createElement("button");
-            mawoiButton.className =
-              "w-full text-left p-1 pl-4 bg-blue-500 focus:outline-none text-xs hover:bg-yellow-700";
-            mawoiButton.dataset.name = "mmawoi-" + mawoi.id;
-            mawoiButton.textContent = mawoi.description;
+          system.mawois
+            .map((mawoi) => {
+              return {
+                ...mawoi,
+                status: existMawoiInMemory(mawoi.id),
+              };
+            })
+            .sort((a, b) => a.status - b.status)
+            .forEach((mawoi) => {
+              const mawoiLi = document.createElement("li");
+              const mawoiButton = document.createElement("button");
+              mawoiButton.className =
+                "w-full text-left p-1 pl-4 bg-white text-blue-900 focus:outline-none text-xs hover:bg-yellow-700 hover:text-white";
+              mawoiButton.dataset.name = "mmawoi-" + mawoi.id;
+              mawoiButton.textContent = mawoi.description;
 
-            // Crear el elemento img
-            const mawoiImage = document.createElement("img");
-            mawoiImage.src = "/icons/mawoi.png"; // Ruta de la imagen
-            mawoiImage.alt = "icons mawoi"; // Texto alternativo
-            mawoiImage.className = "w-6 h-6 mr-2 inline-block"; // Estilo de la imagen
+              // Crear el elemento img
+              const mawoiImage = document.createElement("img");
+              mawoiImage.src = "/icons/mawoi.png"; // Ruta de la imagen
+              mawoiImage.alt = "icons mawoi"; // Texto alternativo
+              mawoiImage.className = "w-6 h-6 mr-2 inline-block"; // Estilo de la imagen
 
-            // Insertar la imagen antes del texto en el botón
-            mawoiButton.prepend(mawoiImage);
+              // Insertar la imagen antes del texto en el botón
+              mawoiButton.prepend(mawoiImage);
 
-            mawoiLi.appendChild(mawoiButton);
-            mawoiList.appendChild(mawoiLi);
-          });
+              // Crear el status
+              const mawoiStatus = document.createElement("img");
+              const status = existMawoiInMemory(mawoi.id);
+              mawoiStatus.src =
+                status == 0
+                  ? "/icons/uncheck.svg"
+                  : status == 2
+                    ? "/icons/check-completed.svg"
+                    : "/icons/check-single.svg"; // Ruta de la imagen
+              mawoiStatus.alt = "icons status mawoi"; // Texto alternativo
+              mawoiStatus.className = "w-[20px]  p-1 inline-block"; // Estilo de la imagen
+
+              mawoiButton.append(mawoiStatus);
+
+              mawoiLi.appendChild(mawoiButton);
+              mawoiList.appendChild(mawoiLi);
+            });
 
           systemLi.appendChild(systemButton);
           systemLi.appendChild(mawoiList);

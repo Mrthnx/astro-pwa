@@ -56,7 +56,12 @@
       mawoiWithCollectData.id = MAWOI_SELECTED.id;
       mawoiWithCollectData.code = MAWOI_SELECTED.code;
       mawoiWithCollectData.description = MAWOI_SELECTED.description;
-      mawoiWithCollectData.pointLength = MAWOI_SELECTED.points.length;
+      const pointsLength = [
+        ...new Set(
+          MAWOI_SELECTED.points.map((point) => point.code.substr(0, 2)),
+        ),
+      ].length;
+      mawoiWithCollectData.pointLength = pointsLength;
       mawoiWithCollectData.points = [];
     }
 
@@ -85,6 +90,15 @@
         "mawoisWithCollectData",
         JSON.stringify(mawoisWithCollectData),
       );
+
+      let plantMemory = localStorage.getItem("plants") || "[]";
+      plantMemory = JSON.parse(plantMemory);
+      plantMemory = plantMemory.filter(Boolean);
+      if (plantMemory && plantMemory.length > 0) {
+        createHierarchyList(plantMemory);
+        setDateByMawoiId(mawoiWithCollectData.id, pointWithCollectData.id);
+      }
+
       hideLoading();
     }, 54000);
   });

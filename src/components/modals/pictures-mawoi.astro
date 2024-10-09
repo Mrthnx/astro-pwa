@@ -1,0 +1,91 @@
+<div
+  id="modal-select-pictures"
+  class="fixed inset-0 flex flex-col items-center justify-center bg-black bg-opacity-50 z-10 hidden"
+>
+  <div
+    class="bg-white rounded-lg p-4 w-10/12 max-w-md h-[70vh] overflow-y-auto"
+  >
+    <div id="carrousel-pictures" class="flex flex-wrap justify-center gap-2">
+      Pictures
+    </div>
+  </div>
+  <script is:inline>
+    let modalIsOpenPicture = false;
+    $modalSelectPicture = document.getElementById("modal-select-pictures");
+    $carrouselPictures = document.getElementById("carrousel-pictures");
+
+    function hideModalPictures() {
+      modalIsOpenPicture = false;
+      $modalSelectPicture?.classList.add("hidden");
+    }
+    async function showModalPictures() {
+      setTimeout(() => {
+        modalIsOpenPicture = true;
+      }, 100);
+      $modalSelectPicture?.classList.remove("hidden");
+      let mawoiStore = localStorage.getItem("mawoiSelected") || null;
+      if (mawoiStore) {
+        mawoiStore = JSON.parse(mawoiStore);
+        await findAndDisplayImage(mawoiStore.id);
+      }
+    }
+    document.addEventListener("click", (event) => {
+      // Verificar si el clic fue fuera del div
+      if (modalIsOpenPicture && !$carrouselPictures.contains(event.target)) {
+        hideModalPictures();
+      }
+    });
+
+    // Detectar tecla 'ESC'
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        // Verifica si la tecla presionada es 'Escape'
+        hideModalPictures();
+      }
+    });
+
+    function getImageFromIndexedDB(db, id) {
+      return new Promise((resolve, reject) => {
+        const transaction = db.transaction(["images"], "readonly");
+        const store = transaction.objectStore("images");
+
+        const request = store.get(id);
+
+        request.onsuccess = function (event) {
+          if (event.target.result) {
+            resolve(event.target.result.images); // Devuelve el Blob de la imagen
+          } else {
+            reject(`No image found for URL: ${id}`);
+          }
+        };
+
+        request.onerror = function (event) {
+          reject(`Error retrieving image: ${id} - ${event.target.errorCode}`);
+        };
+      });
+    }
+
+    function displayImage(blob) {
+      const carrousel = document.getElementById("carrousel-pictures");
+      const imageUrl = URL.createObjectURL(blob);
+      const imgElement = document.createElement("img");
+      imgElement.src = imageUrl;
+      carrousel.appendChild(imgElement); // Añadir la imagen al DOM
+    }
+
+    async function findAndDisplayImage(id) {
+      try {
+        const carrousel = document.getElementById("carrousel-pictures");
+        carrousel.innerHTML = ""; // Limpiar el DOM
+        const db = await openDatabase(); // Abrir la base de datos
+        const blobs = await getImageFromIndexedDB(db, id); // Buscar la imagen por URL
+        // Mostrar la imagen en el DOM
+        for (let blob of blobs) {
+          displayImage(blob);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  </script>
+</div>

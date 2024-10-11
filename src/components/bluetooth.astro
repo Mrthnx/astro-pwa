@@ -130,6 +130,8 @@
     let message;
     const data = event.target.value;
 
+    console.log("Received data: ", data);
+
     try {
       message = new TextDecoder("utf-8").decode(data);
     } catch (_) {

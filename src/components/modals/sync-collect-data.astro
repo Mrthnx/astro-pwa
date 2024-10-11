@@ -178,6 +178,8 @@
     }
 
     function syncSurveyInCloud() {
+      let mawoisWith = localStorage.getItem("mawoisWithCollectData") || "[]";
+      mawoisWith = JSON.parse(mawoisWith);
       if (!surveys || surveys.length == 0) {
         alert("No mawois with collect data");
         return;

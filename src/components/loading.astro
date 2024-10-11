@@ -1,19 +1,22 @@
 <div
   id="loadingOverlay"
-  class="fixed inset-0 flex flex-col items-center justify-center bg-black bg-opacity-50 z-50 hidden"
+  class="fixed inset-0 flex w-full h-full flex-col items-center justify-center bg-black bg-opacity-50 z-50 hidden"
 >
-  <img src="corelusa.png" alt="Loading..." class="h-24" />
+  <img src="corelusa.png" alt="Loading..." class="h-24 w-24" />
   <span id="loadingMessage" class="text-white"></span>
   <span id="loadingSpan" class="text-white">Loading...</span>
 </div>
 <script is:inline>
+  var loadingActive = false;
   function hideLoading() {
     const $loadingOverlay = document.getElementById("loadingOverlay");
     $loadingOverlay?.classList.add("hidden");
+    loadingActive = false;
   }
   function showLoading() {
     const $loadingOverlay = document.getElementById("loadingOverlay");
     $loadingOverlay?.classList.remove("hidden");
+    loadingActive = true;
   }
   function updateMessage(message) {
     const $loadingMessage = document.getElementById("loadingMessage");

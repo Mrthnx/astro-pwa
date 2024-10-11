@@ -1,0 +1,227 @@
+<div
+  id="modal-sync-collect"
+  class="fixed inset-0 flex flex-col items-center justify-center bg-black bg-opacity-50 z-10 hidden"
+>
+  <div
+    class="bg-white rounded-lg p-4 w-10/12 max-w-md h-[70vh] overflow-y-auto"
+  >
+    <div class="w-full flex justify-end">
+      <button
+        id="close-modal-sync"
+        class="w-[30px] bg-red-700 text-white rounded-full px-2"
+      >
+        x
+      </button>
+    </div>
+    <div>
+      <h1 class="text-xl font-bold text-gray-800 text-center">
+        Synchronize survey
+      </h1>
+    </div>
+    <div id="container-data" class="flex flex-col justify-center items-center">
+    </div>
+    <div class="w3/4">
+      <button
+        id="btn-sync-survey"
+        onclick="syncSurveyInCloud()"
+        class="w-full flex bg-blue-800 hover:bg-blue-900 text-white py-1 px-2 rounded-full justify-center"
+      >
+        <span class="px-2">Sync</span>
+        <img src="/icons/sync.svg" alt="sync surveys" class="w-6" />
+      </button>
+    </div>
+  </div>
+  <script is:inline>
+    $modalSyncCollect = document.getElementById("modal-sync-collect");
+    $containerData = document.getElementById("container-data");
+    $btnCloseModalSync = document.getElementById("close-modal-sync");
+    const btnGetVariables = document.getElementById("btn-sync-survey");
+    let surveys = [];
+
+    function hideModalSync() {
+      modalIsOpenSync = false;
+      $modalSyncCollect?.classList.add("hidden");
+      hideLoading();
+    }
+
+    function showModalSync(plantId) {
+      setTimeout(() => {
+        modalIsOpenSync = true;
+      }, 100);
+      $modalSyncCollect?.classList.remove("hidden");
+      getCollectDataForPlantId(plantId);
+    }
+
+    function getCollectDataForPlantId(plantId) {
+      const containerData = document.getElementById("container-data");
+      containerData.innerHTML = "";
+
+      let collectStore = localStorage.getItem("mawoisWithCollectData") || "[]";
+      collectStore = JSON.parse(collectStore);
+      if (collectStore && collectStore.length > 0) {
+        collectStore = collectStore.filter(
+          (collect) => collect.plantId == plantId,
+        );
+        const surveySync = mapSurveyForSync(collectStore);
+        createDivsFromMawois(surveySync);
+      }
+    }
+
+    $btnCloseModalSync.addEventListener("click", () => {
+      hideModalSync();
+    });
+
+    function mapSurveyForSync(mawoisStore) {
+      const syncSurvey = groupPointsByDate(mawoisStore);
+      surveys = [];
+      syncSurvey.forEach((mawoi) => {
+        let { mawoi: mawoiMemory } = findMawoiForCollectData(mawoi.id);
+        mawoi.groupedPoints.forEach((points) => {
+          let details = {
+            mawoiId: mawoi.id,
+            date: points[0].date,
+            points: points.map((point) => point.description),
+            waveform: [],
+            spectrum: [],
+          };
+          points.forEach((point) => {
+            const pointX = mawoiMemory.points.find(
+              (p) =>
+                p.code == point.description + "X" ||
+                p.code == point.description + "V",
+            );
+            point["NEXT_X_W"].forEach((value) => {
+              details.waveform.push({
+                pointId: pointX.id,
+                measure_y: value,
+              });
+            });
+            point["NEXT_X_S"].forEach((value) => {
+              details.spectrum.push({
+                pointId: pointX.id,
+                measure_y: value,
+              });
+            });
+            const pointY = mawoiMemory.points.find(
+              (p) =>
+                p.code == point.description + "Y" ||
+                p.code == point.description + "H",
+            );
+            point["NEXT_Y_W"].forEach((value) => {
+              details.waveform.push({
+                pointId: pointY.id,
+                measure_y: value,
+              });
+            });
+            point["NEXT_Y_S"].forEach((value) => {
+              details.spectrum.push({
+                pointId: pointY.id,
+                measure_y: value,
+              });
+            });
+            const pointZ = mawoiMemory.points.find(
+              (p) =>
+                p.code == point.description + "Z" ||
+                p.code == point.description + "A",
+            );
+            point["NEXT_Z_W"].forEach((value) => {
+              details.waveform.push({
+                pointId: pointZ.id,
+                measure_y: value,
+              });
+            });
+            point["NEXT_Z_S"].forEach((value) => {
+              details.spectrum.push({
+                pointId: pointZ.id,
+                measure_y: value,
+              });
+            });
+          });
+          surveys.push(details);
+        });
+      });
+      return surveys;
+    }
+
+    function createDivsFromMawois(mawoiData) {
+      const containerData = document.getElementById("container-data");
+      containerData.innerHTML = "";
+      mawoiData.forEach((item) => {
+        // Crear el contenedor principal para cada mawoi
+        const mawoiDiv = document.createElement("div");
+        mawoiDiv.className = "bg-white shadow-md rounded-lg p-4 mb-4";
+
+        // Crear el elemento para mawoiId
+        const mawoiIdDiv = document.createElement("div");
+        mawoiIdDiv.className = "text-lg font-bold text-gray-800";
+        mawoiIdDiv.textContent = `Mawoi ID: ${item.mawoiId}`;
+
+        // Crear el elemento para la fecha
+        const dateDiv = document.createElement("div");
+        dateDiv.className = "text-sm text-gray-600";
+        const date = new Date(item.date); // Convertir timestamp a fecha
+        dateDiv.textContent = `Date: ${date.toLocaleString()}`;
+
+        // Crear el contenedor para los puntos (poinst)
+        const poinstDiv = document.createElement("div");
+        poinstDiv.className = "mt-2";
+        poinstDiv.innerHTML = `<span class="font-semibold">Poinst:</span> ${item.points.join(", ")}`;
+
+        // Añadir los elementos al contenedor principal
+        mawoiDiv.appendChild(mawoiIdDiv);
+        mawoiDiv.appendChild(dateDiv);
+        mawoiDiv.appendChild(poinstDiv);
+
+        // Añadir el contenedor principal al DOM
+        containerData.appendChild(mawoiDiv);
+      });
+    }
+
+    function syncSurveyInCloud() {
+      if (!surveys || surveys.length == 0) {
+        alert("No mawois with collect data");
+        return;
+      }
+      showLoading();
+      for (let survey of surveys) {
+        fetch("https://backendaws.pdmmonitor.com/offline/survey", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(survey),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            showLoading();
+            return data.data;
+          })
+          .then((data) => {
+            mawoisWith = mawoisWith.filter(
+              (mawoi) => mawoi.id != data.mawoi.id,
+            );
+            localStorage.setItem(
+              "mawoisWithCollectData",
+              JSON.stringify(mawoisWith),
+            );
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          })
+          .finally(() => {
+            hideLoading();
+            hideModalSync();
+          });
+      }
+    }
+
+    // Detectar tecla 'ESC'
+    document.addEventListener("keydown", (event) => {
+      if (loadingActive) return;
+      if (event.key === "Escape") {
+        // Verifica si la tecla presionada es 'Escape'
+        hideModalSync();
+      }
+    });
+  </script>
+</div>

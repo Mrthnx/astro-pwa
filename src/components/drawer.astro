@@ -108,12 +108,19 @@
     if (CHARTS[eventActive]) {
       CHARTS[eventActive].destroy();
     }
+
+    const FMAX = 90000;
+    const nRevs = 4;
+    const RPM = 3600;
+
     if (drawsStore[eventActive] && drawsStore[eventActive].length > 0) {
       options.title.text = drawTitles[eventActive];
       options.container = document.getElementById(eventActive);
       options.data = drawsStore[eventActive].map((valueY, index) => ({
         y: valueY,
-        x: index,
+        x: eventActive.includes("_S")
+          ? (index * FMAX) / drawsStore[eventActive].length
+          : (index * 60000 * nRevs) / (RPM * drawsStore[eventActive].length),
       }));
       CHARTS[eventActive] = agCharts.AgCharts.create({ ...options });
     }
@@ -146,11 +153,16 @@
     }
   }
 
-  function setInformationMawoi({ code, description, id, points }, system) {
+  function setInformationMawoi(
+    { code, description, id, points },
+    system,
+    plant,
+  ) {
     MAWOI_SELECTED = {
       code,
       description,
       id,
+      plantId: plant.id,
       points,
     };
     const mawoiSelect = document.getElementById("mawoi-select");
@@ -303,7 +315,11 @@
         MAWOI_SELECTED = mawoiSelectedStore;
         const hierarchy = findMawoiForCollectData(MAWOI_SELECTED.id);
         if (hierarchy && hierarchy.system) {
-          setInformationMawoi(MAWOI_SELECTED, hierarchy.system);
+          setInformationMawoi(
+            MAWOI_SELECTED,
+            hierarchy.system,
+            hierarchy.plant,
+          );
         }
       }
     }
@@ -323,6 +339,10 @@
 
   const $buttonPicture = document.getElementById("button-picture");
   $buttonPicture.addEventListener("click", () => {
+    if (!MAWOI_SELECTED || !MAWOI_SELECTED.id) {
+      alert("Please select a mawoi");
+      return;
+    }
     showModalPictures();
   });
 </script>

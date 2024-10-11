@@ -17,6 +17,7 @@
     function hideModalPictures() {
       modalIsOpenPicture = false;
       $modalSelectPicture?.classList.add("hidden");
+      hideLoading();
     }
     async function showModalPictures() {
       setTimeout(() => {
@@ -31,6 +32,7 @@
     }
     document.addEventListener("click", (event) => {
       // Verificar si el clic fue fuera del div
+      if (loadingActive) return;
       if (modalIsOpenPicture && !$carrouselPictures.contains(event.target)) {
         hideModalPictures();
       }
@@ -38,6 +40,7 @@
 
     // Detectar tecla 'ESC'
     document.addEventListener("keydown", (event) => {
+      if (loadingActive) return;
       if (event.key === "Escape") {
         // Verifica si la tecla presionada es 'Escape'
         hideModalPictures();

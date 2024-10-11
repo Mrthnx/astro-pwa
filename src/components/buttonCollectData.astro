@@ -55,6 +55,7 @@
     } else {
       mawoiWithCollectData.id = MAWOI_SELECTED.id;
       mawoiWithCollectData.code = MAWOI_SELECTED.code;
+      mawoiWithCollectData.plantId = MAWOI_SELECTED.plantId;
       mawoiWithCollectData.description = MAWOI_SELECTED.description;
       const pointsLength = [
         ...new Set(
@@ -68,6 +69,8 @@
     const pointSelect = document.getElementById("point-select");
     pointWithCollectData.id = pointSelect.value;
     pointWithCollectData.date = new Date().getTime();
+    pointWithCollectData.description =
+      pointSelect.options[pointSelect.selectedIndex].text;
 
     eventActive = "NEXT_X";
     writeOnCharacteristic("NEXT_X");

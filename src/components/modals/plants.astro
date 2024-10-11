@@ -72,6 +72,7 @@
     function hideModalPlants() {
       modalIsOpen = false;
       $modalSelectPlant?.classList.add("hidden");
+      hideLoading();
     }
     function showModalPlants() {
       setTimeout(() => {
@@ -98,7 +99,7 @@
           return;
         }
         showLoading();
-        fetch("https://backend.pdmmonitor.com/offline/points/" + plantId)
+        fetch("https://backendaws.pdmmonitor.com/offline/points/" + plantId)
           .then((response) => response.json())
           .then((data) => data.data)
           .then((data) => {
@@ -141,7 +142,7 @@
     function getPlants(account = "", plantSearch = "") {
       showLoading();
       fetch(
-        "https://backend.pdmmonitor.com/offline/plants?account=" +
+        "https://backendaws.pdmmonitor.com/offline/plants?account=" +
           account +
           "&plant=" +
           plantSearch,
@@ -175,6 +176,7 @@
 
     document.addEventListener("click", (event) => {
       // Verificar si el clic fue fuera del div
+      if (loadingActive) return;
       if (
         modalIsOpen &&
         $tableSelectPlant &&
@@ -187,6 +189,7 @@
 
     // Detectar tecla 'ESC'
     document.addEventListener("keydown", (event) => {
+      if (loadingActive) return;
       if (event.key === "Escape") {
         // Verifica si la tecla presionada es 'Escape'
         hideModalPlants();

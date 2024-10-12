@@ -34,10 +34,41 @@
       alert("Please turn on Bluetooth!");
       return;
     }
+
+    let setVariables = localStorage.getItem("setVariables");
+    if (!setVariables) {
+      alert("Please set variables!");
+      return;
+    }
+
     if (MAWOI_SELECTED == null) {
       alert("Please select a mawoi!");
       return;
     }
+
+    setVariables = JSON.parse(setVariables);
+
+    setTimeout(() => {
+      writeOnCharacteristic("SET_SAMPLES=" + setVariables.samples);
+      setTimeout(() => {
+        writeOnCharacteristic("SET_NLINES=" + setVariables.lines);
+        setTimeout(() => {
+          writeOnCharacteristic("SET_NREVS=" + setVariables.revolution);
+          setTimeout(() => {
+            writeOnCharacteristic("SET_FMAX=" + setVariables.fmax);
+            setTimeout(() => {
+              writeOnCharacteristic("SET_RPM=" + setVariables.rpm);
+              setTimeout(() => {
+                proessCollectData();
+              }, 500);
+            }, 500);
+          }, 500);
+        }, 500);
+      }, 500);
+    }, 0);
+  });
+
+  function proessCollectData() {
     drawClear();
     showLoading();
     let mawoiStore = localStorage.getItem("mawoiSelected");
@@ -104,5 +135,5 @@
 
       hideLoading();
     }, 54000);
-  });
+  }
 </script>

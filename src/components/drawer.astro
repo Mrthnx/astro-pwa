@@ -1,3 +1,7 @@
+---
+import PopoverSetVar from "./popoverSetVar.astro";
+---
+
 <div class="drawer pt-2">
   <div class="flex justify-around items-center p-2 flex-wrap gap-1 w-full">
     <!-- name mawoi in h2 --->
@@ -19,15 +23,7 @@
         <img src="/icons/pictures.svg" alt="find pictures" class="w-6" />
       </button>
     </div>
-    <div>
-      <button
-        id="get-vars"
-        class="flex bg-blue-800 hover:bg-blue-900 text-white py-1 px-2 rounded-full"
-      >
-        <span class="px-2">Get</span>
-        <img src="/icons/get.svg" alt="get variables" class="w-6" />
-      </button>
-    </div>
+    <PopoverSetVar />
   </div>
   <div class="h-[520px]">
     <div id="NEXT_X_W" class="h-[250px]"></div>
@@ -55,11 +51,6 @@
   }
 </style>
 <script is:inline>
-  const btnGetVars = document.getElementById("get-vars");
-  btnGetVars.addEventListener("click", () => {
-    writeOnCharacteristic("GET_VARIABLES");
-  });
-
   var MAWOI_SELECTED = null;
 
   var CHARTS = {

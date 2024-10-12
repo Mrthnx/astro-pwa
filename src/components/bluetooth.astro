@@ -5,7 +5,7 @@
   //Define BLE Device Specs
   var deviceName = "ESP32_BLE";
   var bleService = "91bad492-b950-4226-aa2b-4ede9fa42f59";
-  var ledCharacteristic = "cba1d466-344c-4be3-ab3f-189f80dd7518";
+  var dataCharacteristic = "cba1d466-344c-4be3-ab3f-189f80dd7518";
   var sensorCharacteristic = "19b10001-e8f2-537e-4f6c-d104768a1214";
 
   var currentDataType = null; // 'time_domain' o 'frequency_domain'
@@ -72,7 +72,13 @@
   async function getCharacteristic(service) {
     bleServiceFound = service;
     console.log("Service discovered:", service.uuid);
-    return await service.getCharacteristic(ledCharacteristic);
+    return await service.getCharacteristic(dataCharacteristic);
+  }
+
+  async function getCharacteristicCommand(service) {
+    bleServiceFound = service;
+    console.log("Service sensor discovered:", service.uuid);
+    return await service.getCharacteristic(sensorCharacteristic);
   }
 
   async function getCharacteristicValue(characteristic) {
@@ -84,7 +90,16 @@
     );
     characteristic.startNotifications();
     console.log("Notifications Started.");
-    // characteristic.readValue();
+  }
+
+  async function getCharacteristicCommandValue(characteristic) {
+    console.log("Characteristic command discovered:", characteristic.uuid);
+    characteristic.addEventListener(
+      "characteristicvaluechanged",
+      handleCharacteristicCommandChange,
+    );
+    characteristic.startNotifications();
+    console.log("Notifications Started.");
   }
 
   async function getDecodedValue(value) {
@@ -104,7 +119,9 @@
       const service = await connectDevice(gattServer);
       console.log("Service connected:", service.uuid);
       const characteristic = await getCharacteristic(service);
+      // const characteristicCommand = await getCharacteristicCommand(service);
       getCharacteristicValue(characteristic);
+      // getCharacteristicCommandValue(characteristicCommand);
 
       // activar toggle
       switchLabel.classList.remove("bg-red-500");
@@ -124,6 +141,13 @@
     bleStateContainer.style.color = "#d13a30";
 
     connectToDevice();
+  }
+
+  function handleCharacteristicCommandChange(event) {
+    let message;
+    const data = event.target.value;
+
+    console.log("Received data: ", data);
   }
 
   function handleCharacteristicChange(event) {

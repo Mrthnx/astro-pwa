@@ -1,0 +1,131 @@
+<div>
+  <button
+    id="get-vars"
+    class="flex bg-blue-800 hover:bg-blue-900 text-white py-1 px-2 rounded-full"
+    onclick="toggleCustomPopover()"
+  >
+    <span class="px-2">Set Var</span>
+    <img src="/icons/variables.svg" alt="get variables" class="w-6" />
+  </button>
+  <!-- Popover -->
+  <div
+    id="popover"
+    class="hidden absolute bg-blue-800 p-4 shadow-lg rounded-lg mt-2 text-sm text-white"
+  >
+    <div class="block min-w-[200px]">
+      <div class="flex justify-around items-center">
+        <label for="rpm" class="px-2">RPM</label>
+        <input
+          type="number"
+          id="rpm"
+          class="w-full text-blue-900 px-2 rounded-full focus:outline-none focus:ring-0 focus:border-transparent"
+          value="1800"
+        />
+      </div>
+      <h3 class="p-2 text-lg font-bold">Spectrum</h3>
+      <div class="flex justify-around items-center py-2">
+        <label for="fmax" class="px-2">FMAX</label>
+        <input
+          type="number"
+          id="fmax"
+          class="w-full text-blue-900 px-2 rounded-full focus:outline-none focus:ring-0 focus:border-transparent"
+          value="90000"
+        />
+      </div>
+      <div class="flex items-center py-2">
+        <label for="lines" class="px-2">LINES</label>
+        <select
+          id="lines"
+          class="w-full text-blue-900 px-2 rounded-full focus:outline-none focus:ring-0 focus:border-transparent"
+        >
+          <option value="200">200</option>
+          <option value="400">400</option>
+          <option value="800">800</option>
+          <option selected value="1600">1600</option>
+        </select>
+      </div>
+      <h3 class="font-bold p-2 text-lg">Waveform</h3>
+      <div class="flex justify-around items-center py-2">
+        <label for="revolution" class="px-2">REV</label>
+        <input
+          type="number"
+          id="revolution"
+          class="w-full text-blue-900 px-2 rounded-full focus:outline-none focus:ring-0 focus:border-transparent"
+          value="4"
+          min="0"
+          max="24"
+        />
+      </div>
+      <div class="flex items-center py-2">
+        <label for="samples" class="px-2">SAMPLES</label>
+        <select
+          id="samples"
+          class="w-full text-blue-900 px-2 rounded-full focus:outline-none focus:ring-0 focus:border-transparent"
+        >
+          <option value="512">512</option>
+          <option selected value="1024">1024</option>
+          <option value="2048">2048</option>
+          <option value="4096">4096</option>
+        </select>
+      </div>
+      <div class="p-2">
+        <button
+          onclick="saveVariables()"
+          class="w-full bg-white hover:font-bold hover:bg-blue-200 text-blue-800 p-1 rounded-full"
+        >
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<style>
+  #popover {
+    position: absolute;
+    z-index: 10;
+    display: none;
+  }
+
+  #popover.visible {
+    display: block;
+  }
+</style>
+<script is:inline>
+  function saveVariables() {
+    const rpm = document.getElementById("rpm").value;
+    const fmax = document.getElementById("fmax").value;
+    const lines = document.getElementById("lines").value;
+    const revolution = document.getElementById("revolution").value;
+    const samples = document.getElementById("samples").value;
+
+    if (+revolution > 24 || +revolution < 0) {
+      alert("Revolution must be between 0 and 24");
+      return;
+    }
+
+    localStorage.setItem(
+      "setVariables",
+      JSON.stringify({ rpm, fmax, lines, revolution, samples }),
+    );
+
+    alert("Variables saved!");
+  }
+
+  function adjustPopoverPosition() {
+    const rect = popover.getBoundingClientRect();
+    const viewportWidth = window.innerWidth;
+
+    if (rect.right > viewportWidth) {
+      // Si el popover se sale de la pantalla, moverlo hacia la izquierda
+      popover.style.left = `${viewportWidth - rect.width - 30}px`;
+    } else {
+      // Restablecer posición si no se sale
+      popover.style.left = "";
+    }
+  }
+  function toggleCustomPopover() {
+    const popover = document.getElementById("popover");
+    popover.classList.toggle("visible");
+    adjustPopoverPosition();
+  }
+</script>

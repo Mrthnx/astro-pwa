@@ -1,5 +1,7 @@
 ---
 import PopoverSetVar from "./popoverSetVar.astro";
+import PopoverWaveform from "./popoverWaveform.astro";
+import PopoverSpectrum from "./popoverSpectrum.astro";
 ---
 
 <div class="drawer pt-2">
@@ -26,19 +28,25 @@ import PopoverSetVar from "./popoverSetVar.astro";
     <PopoverSetVar />
   </div>
   <div class="h-[520px]">
+    <PopoverWaveform chartName="NEXT_X_W" />
     <div id="NEXT_X_W" class="h-[250px]"></div>
+    <PopoverSpectrum chartName="NEXT_X_S" />
     <div id="NEXT_X_S" class="h-[250px]"></div>
   </div>
   <hr />
 
   <div class="h-[520px]">
+    <PopoverWaveform chartName="NEXT_Y_W" />
     <div id="NEXT_Y_W" class="h-[250px]"></div>
+    <PopoverSpectrum chartName="NEXT_Y_S" />
     <div id="NEXT_Y_S" class="h-[250px]"></div>
   </div>
   <hr />
 
   <div class="h-[520px]">
+    <PopoverWaveform chartName="NEXT_Z_W" />
     <div id="NEXT_Z_W" class="h-[250px]"></div>
+    <PopoverSpectrum chartName="NEXT_Z_S" />
     <div id="NEXT_Z_S" class="h-[250px]"></div>
   </div>
 </div>
@@ -62,47 +70,8 @@ import PopoverSetVar from "./popoverSetVar.astro";
     NEXT_Z_S: null,
   };
 
-  const options = {
-    title: {
-      text: "",
-    },
-    tooltip: {
-      enabled: true,
-    },
-    axes: [
-      {
-        type: "number",
-        position: "left",
-      },
-      {
-        type: "number",
-        position: "bottom",
-        nice: false,
-        label: {
-          autoRotate: true,
-        },
-      },
-    ],
-    container: "",
-    data: [],
-    series: [
-      {
-        type: "line",
-        xKey: "x",
-        yKey: "y",
-        marker: { shape: "circle", size: 0.5, strokeWidth: 1 },
-      },
-    ],
-  };
-
-  const drawTitles = {
-    NEXT_X_W: "X-axis (Waveform)",
-    NEXT_X_S: "X-axis (Spectrum)",
-    NEXT_Y_W: "Y-axis (Waveform)",
-    NEXT_Y_S: "Y-axis (Spectrum)",
-    NEXT_Z_W: "Z-axis (Waveform)",
-    NEXT_Z_S: "Z-axis (Spectrum)",
-  };
+  const options = OPTIONS_DRAW;
+  const drawTitles = DRAW_TITLES;
 
   function drawAxios(eventActive, pointTemp = null) {
     let drawsStore = pointTemp || pointWithCollectData;
@@ -110,13 +79,16 @@ import PopoverSetVar from "./popoverSetVar.astro";
       drawsStore[eventActive] = drawsStore[eventActive] || [];
     }
 
+    const vars = drawsStore.vars;
+
     if (CHARTS[eventActive]) {
       CHARTS[eventActive].destroy();
     }
 
-    const FMAX = 90000;
-    const nRevs = 4;
-    const RPM = 3600;
+    const FMAX = vars.fmax;
+    const nRevs = vars.revolution;
+    const RPM = vars.rpm;
+    const MIN_TO_SECONDS = 60000;
 
     if (drawsStore[eventActive] && drawsStore[eventActive].length > 0) {
       options.title.text = drawTitles[eventActive];
@@ -125,37 +97,27 @@ import PopoverSetVar from "./popoverSetVar.astro";
         y: valueY,
         x: eventActive.includes("_S")
           ? (index * FMAX) / drawsStore[eventActive].length
-          : (index * 60000 * nRevs) / (RPM * drawsStore[eventActive].length),
+          : (index * MIN_TO_SECONDS * nRevs) /
+            (RPM * drawsStore[eventActive].length),
       }));
       CHARTS[eventActive] = agCharts.AgCharts.create({ ...options });
     }
   }
 
+  function drawSimpleClear(title) {
+    if (CHARTS[title]) {
+      CHARTS[title].destroy();
+      CHARTS[title] = null;
+    }
+  }
+
   function drawClear() {
-    if (CHARTS["NEXT_X_W"]) {
-      CHARTS["NEXT_X_W"].destroy();
-      CHARTS["NEXT_X_W"] = null;
-    }
-    if (CHARTS["NEXT_X_S"]) {
-      CHARTS["NEXT_X_S"].destroy();
-      CHARTS["NEXT_X_S"] = null;
-    }
-    if (CHARTS["NEXT_Y_W"]) {
-      CHARTS["NEXT_Y_W"].destroy();
-      CHARTS["NEXT_Y_W"] = null;
-    }
-    if (CHARTS["NEXT_Y_S"]) {
-      CHARTS["NEXT_Y_S"].destroy();
-      CHARTS["NEXT_Y_S"] = null;
-    }
-    if (CHARTS["NEXT_Z_W"]) {
-      CHARTS["NEXT_Z_W"].destroy();
-      CHARTS["NEXT_Z_W"] = null;
-    }
-    if (CHARTS["NEXT_Z_S"]) {
-      CHARTS["NEXT_Z_S"].destroy();
-      CHARTS["NEXT_Z_S"] = null;
-    }
+    drawSimpleClear("NEXT_X_W");
+    drawSimpleClear("NEXT_X_S");
+    drawSimpleClear("NEXT_Y_W");
+    drawSimpleClear("NEXT_Y_S");
+    drawSimpleClear("NEXT_Z_W");
+    drawSimpleClear("NEXT_Z_S");
   }
 
   function setInformationMawoi(

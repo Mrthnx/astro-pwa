@@ -48,6 +48,8 @@
 
     setVariables = JSON.parse(setVariables);
 
+    showLoading();
+    updateMessage("Set variables");
     setTimeout(() => {
       writeOnCharacteristic("SET_SAMPLES=" + setVariables.samples);
       setTimeout(() => {
@@ -59,6 +61,7 @@
             setTimeout(() => {
               writeOnCharacteristic("SET_RPM=" + setVariables.rpm);
               setTimeout(() => {
+                hideLoading();
                 proessCollectData();
               }, 500);
             }, 500);
@@ -102,6 +105,11 @@
     pointWithCollectData.date = new Date().getTime();
     pointWithCollectData.description =
       pointSelect.options[pointSelect.selectedIndex].text;
+
+    const vars = localStorage.getItem("setVariables");
+    if (vars) {
+      pointWithCollectData.vars = JSON.parse(vars);
+    }
 
     eventActive = "NEXT_X";
     writeOnCharacteristic("NEXT_X");

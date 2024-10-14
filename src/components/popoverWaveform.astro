@@ -1,0 +1,142 @@
+---
+const { chartName } = Astro.props;
+---
+
+<div>
+  <div class="absolute">
+    <div
+      class="cursor-pointer w-[98vw] pr-1 flex justify-end relative top-4 z-10 px-5 gap-6"
+    >
+      <div>
+        <button onclick={`convertWaveformDraws('${chartName}')`}>
+          <img src="/icons/convert.svg" alt="" class="w-8" />
+        </button>
+      </div>
+      <div>
+        <button
+          onclick={`toggleCustomPopoverWaveform('${chartName}')`}
+          id="popoverButton"
+        >
+          <img src="/corelusa.png" alt="" class="w-8" />
+        </button>
+        <!-- Popover -->
+        <div
+          id={`customPopoverWaveform_${chartName}`}
+          class="absolute right-0 mt-2 top-4 w-48 p-4 bg-white rounded-lg shadow-lg border border-gray-200 z-20 hidden"
+        >
+          <div id={`popoverWaveformContent_${chartName}`}></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<style>
+  #popover {
+    position: absolute;
+    z-index: 10;
+    display: none;
+  }
+
+  #popover.visible {
+    display: block;
+  }
+</style>
+<script is:inline>
+  function adjustPopoverPosition() {
+    const rect = popover.getBoundingClientRect();
+    const viewportWidth = window.innerWidth;
+
+    if (rect.right > viewportWidth) {
+      // Si el popover se sale de la pantalla, moverlo hacia la izquierda
+      popover.style.left = `${viewportWidth - rect.width - 30}px`;
+    } else {
+      // Restablecer posición si no se sale
+      popover.style.left = "";
+    }
+  }
+  function toggleCustomPopoverWaveform(chartName) {
+    if (!CHARTS[chartName]) {
+      alert("First, draw the chart");
+      return;
+    }
+
+    const popover = document.getElementById(
+      `customPopoverWaveform_${chartName}`,
+    );
+    popover.classList.toggle("hidden");
+    adjustPopoverPosition();
+
+    let charts_y = CHARTS[chartName].chart.data.map((d) => d.y);
+
+    const temp = "70.8";
+    const _crestFactor = crestFactor(charts_y);
+    const _pkTopk = peakToPeak(charts_y);
+    const pkTopk = `+${_pkTopk.max}/-${_pkTopk.min} (${_pkTopk.pkTopk})`;
+
+    // Mostrar los valores en el popover
+    const popoverContent = document.getElementById(
+      `popoverWaveformContent_${chartName}`,
+    );
+    popoverContent.innerHTML = `
+    <p>Crest Factor: ${_crestFactor}</p>
+    <p>Peak to Peak: ${pkTopk}</p>
+    <p>Temperature: ${temp}</p>
+    `;
+    charts_y = [];
+  }
+
+  function convertWaveformDraws(chartName) {
+    showLoading();
+    let mawoisStore = localStorage.getItem("mawoisWithCollectData") || "[]";
+    mawoisStore = JSON.parse(mawoisStore);
+    if (mawoisStore.length == 0) {
+      hideLoading();
+      alert("Please draw the mawoi");
+      return;
+    }
+
+    const mawoiStore = mawoisStore.find(
+      (mawoi) => mawoi.id == MAWOI_SELECTED.id,
+    );
+    if (!mawoiStore) {
+      hideLoading();
+      alert("Please draw the mawoi");
+      return;
+    }
+
+    const pointSelected = document.getElementById("point-select").value;
+    const dateSelected = document.getElementById("date-collect").value;
+
+    const pointStore = mawoiStore.points.find(
+      (point) => point.id == pointSelected && point.date == dateSelected,
+    );
+
+    if (!pointStore) {
+      hideLoading();
+      alert("Please draw the point");
+      return;
+    }
+
+    if (!CHARTS[chartName]) {
+      hideLoading();
+      alert("First, draw the chart");
+      return;
+    }
+
+    UNIT_W++;
+
+    if (UNIT_W > 3) {
+      UNIT_W = 1;
+    }
+
+    if (UNIT_W == 2) {
+      pointStore[chartName] = waveformVelocity(pointStore[chartName]);
+    } else if (UNIT_W == 3) {
+      pointStore[chartName] = waveformDisplacement(pointStore[chartName]);
+    }
+
+    drawSimpleClear(chartName);
+    drawAxios(chartName, pointStore);
+    hideLoading();
+  }
+</script>

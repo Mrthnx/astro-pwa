@@ -81,6 +81,7 @@
             mawoiId: mawoi.id,
             date: points[0].date,
             points: points.map((point) => point.description),
+            vars: points[0].vars,
             waveform: [],
             spectrum: [],
           };
@@ -186,7 +187,7 @@
       }
       showLoading();
       for (let survey of surveys) {
-        fetch("https://backendaws.pdmmonitor.com/offline/survey", {
+        fetch(URL_BACKEND + "/offline/survey", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

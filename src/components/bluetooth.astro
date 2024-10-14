@@ -154,8 +154,6 @@
     let message;
     const data = event.target.value;
 
-    console.log("Received data: ", data);
-
     try {
       message = new TextDecoder("utf-8").decode(data);
     } catch (_) {
@@ -163,6 +161,7 @@
     }
 
     if (message && markers.includes(message)) {
+      console.log("Received data...", message);
       if (message === "TIME_DOMAIN") {
         console.log("Init data in time domain.");
         updateMessage(eventActive);

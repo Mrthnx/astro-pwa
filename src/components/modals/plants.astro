@@ -99,7 +99,7 @@
           return;
         }
         showLoading();
-        fetch("https://backendaws.pdmmonitor.com/offline/points/" + plantId)
+        fetch(URL_BACKEND + "/offline/points/" + plantId)
           .then((response) => response.json())
           .then((data) => data.data)
           .then((data) => {
@@ -142,7 +142,8 @@
     function getPlants(account = "", plantSearch = "") {
       showLoading();
       fetch(
-        "https://backendaws.pdmmonitor.com/offline/plants?account=" +
+        URL_BACKEND +
+          "/offline/plants?account=" +
           account +
           "&plant=" +
           plantSearch,

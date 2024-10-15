@@ -32,11 +32,11 @@ function meanOverall(numeros) {
 function calculateOverall(arr) {
   const sumOfSquares = arr.reduce((sum, num) => sum + num ** 2, 0);
   const result = Math.sqrt(sumOfSquares);
-  return roundDecimals(result && result > 100 ? 0 : result);
+  return roundDecimals(result);
 }
 
 function spectraVelocity(input) {
-  const fixedMultiplier = 2; // Ajusta este valor según tus necesidades
+  const fixedMultiplier = 2000; // Ajusta este valor según tus necesidades
   const fullTurn = 360; // Ajusta este valor según tus necesidades
 
   // Convertir la entrada en un array de números
@@ -66,7 +66,7 @@ function spectraVelocity(input) {
 }
 
 function spectraDisplacement(input) {
-  const fixedMultiplier = 2; // Ajusta este valor según tus necesidades
+  const fixedMultiplier = 2000; // Ajusta este valor según tus necesidades
   const fullTurn = 360; // Ajusta este valor según tus necesidades
 
   // Convertir la entrada en un array de números

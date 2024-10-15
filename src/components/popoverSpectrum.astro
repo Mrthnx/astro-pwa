@@ -8,16 +8,20 @@ const { chartName } = Astro.props;
       class="cursor-pointer w-[98vw] pr-1 flex justify-end relative top-4 z-10 px-5 gap-6"
     >
       <div>
-        <button onclick={`convertSpectrumDraws('${chartName}')`}>
+        <button
+          class="rounded-md border-2 border-blue-800"
+          onclick={`convertSpectrumDraws('${chartName}')`}
+        >
           <img src="/icons/convert.svg" alt="" class="w-8" />
         </button>
       </div>
       <div>
         <button
+          class="rounded-md border-2 border-blue-800"
           onclick={`toggleCustomPopoverSpectrum('${chartName}')`}
           id="popoverButton"
         >
-          <img src="/corelusa.png" alt="" class="w-8" />
+          <img src="/icons/bands.svg" alt="" class="w-8" />
         </button>
         <!-- Popover -->
         <div

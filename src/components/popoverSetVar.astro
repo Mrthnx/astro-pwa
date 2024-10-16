@@ -108,7 +108,25 @@
       JSON.stringify({ rpm, fmax, lines, revolution, samples }),
     );
 
-    alert("Variables saved!");
+    showLoading();
+    updateMessage("Saving variables...");
+    setTimeout(() => {
+      hideLoading();
+      toggleCustomPopover();
+    }, 1000);
+  }
+
+  function setVariablesDefault() {
+    const rpm = document.getElementById("rpm").value;
+    const fmax = document.getElementById("fmax").value;
+    const lines = document.getElementById("lines").value;
+    const revolution = document.getElementById("revolution").value;
+    const samples = document.getElementById("samples").value;
+
+    localStorage.setItem(
+      "setVariables",
+      JSON.stringify({ rpm, fmax, lines, revolution, samples }),
+    );
   }
 
   function adjustPopoverPosition() {

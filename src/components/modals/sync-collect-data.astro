@@ -192,6 +192,7 @@
         return;
       }
       showLoading();
+      updateMessage("Syncing surveys...");
       for (let survey of surveys) {
         fetch(URL_BACKEND + "/offline/survey", {
           method: "POST",

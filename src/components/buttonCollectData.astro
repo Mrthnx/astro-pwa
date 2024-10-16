@@ -37,8 +37,8 @@
 
     let setVariables = localStorage.getItem("setVariables");
     if (!setVariables) {
-      alert("Please set variables!");
-      return;
+      setVariablesDefault();
+      setVariables = localStorage.getItem("setVariables");
     }
 
     if (MAWOI_SELECTED == null) {
@@ -62,7 +62,7 @@
               writeOnCharacteristic("SET_RPM=" + setVariables.rpm);
               setTimeout(() => {
                 hideLoading();
-                proessCollectData();
+                processCollectData();
               }, 500);
             }, 500);
           }, 500);
@@ -71,7 +71,7 @@
     }, 0);
   });
 
-  function proessCollectData() {
+  function processCollectData() {
     drawClear();
     showLoading();
     let mawoiStore = localStorage.getItem("mawoiSelected");

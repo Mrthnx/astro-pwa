@@ -94,12 +94,14 @@
             point["NEXT_X_W"].forEach((value) => {
               details.waveform.push({
                 pointId: pointX.id,
+                pointCode: pointX.code,
                 measure_y: value,
               });
             });
             point["NEXT_X_S"].forEach((value) => {
               details.spectrum.push({
                 pointId: pointX.id,
+                pointCode: pointX.code,
                 measure_y: value,
               });
             });
@@ -111,12 +113,14 @@
             point["NEXT_Y_W"].forEach((value) => {
               details.waveform.push({
                 pointId: pointY.id,
+                pointCode: pointY.code,
                 measure_y: value,
               });
             });
             point["NEXT_Y_S"].forEach((value) => {
               details.spectrum.push({
                 pointId: pointY.id,
+                pointCode: pointY.code,
                 measure_y: value,
               });
             });
@@ -128,12 +132,14 @@
             point["NEXT_Z_W"].forEach((value) => {
               details.waveform.push({
                 pointId: pointZ.id,
+                pointCode: pointZ.code,
                 measure_y: value,
               });
             });
             point["NEXT_Z_S"].forEach((value) => {
               details.spectrum.push({
                 pointId: pointZ.id,
+                pointCode: pointZ.code,
                 measure_y: value,
               });
             });

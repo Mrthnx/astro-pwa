@@ -35,12 +35,12 @@ const OPTIONS_DRAW = {
 };
 
 const DRAW_TITLES = {
-  NEXT_X_W: "X-axis (Waveform)",
-  NEXT_X_S: "X-axis (Spectrum)",
-  NEXT_Y_W: "Y-axis (Waveform)",
-  NEXT_Y_S: "Y-axis (Spectrum)",
-  NEXT_Z_W: "Z-axis (Waveform)",
-  NEXT_Z_S: "Z-axis (Spectrum)",
+  NEXT_X_W: "X Acc (Waveform)",
+  NEXT_X_S: "X Acc (Spectrum)",
+  NEXT_Y_W: "Y Acc (Waveform)",
+  NEXT_Y_S: "Y Acc (Spectrum)",
+  NEXT_Z_W: "Z Acc (Waveform)",
+  NEXT_Z_S: "Z Acc (Spectrum)",
 };
 
 let UNIT_W = 1; // 1: Acc, 2: Vel, 3: Disp

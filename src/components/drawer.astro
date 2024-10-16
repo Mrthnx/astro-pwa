@@ -91,7 +91,22 @@ import PopoverSpectrum from "./popoverSpectrum.astro";
     const MIN_TO_SECONDS = 60000;
 
     if (drawsStore[eventActive] && drawsStore[eventActive].length > 0) {
-      options.title.text = drawTitles[eventActive];
+      let title = drawTitles[eventActive];
+      if (eventActive.includes("_S")) {
+        if (UNIT_S == 2) {
+          title = title.replace("Acc", "Vel");
+        } else if (UNIT_S == 3) {
+          title = title.replace("Acc", "Disp");
+        }
+      } else if (eventActive.includes("_W")) {
+        if (UNIT_W == 2) {
+          title = title.replace("Acc", "Vel");
+        } else if (UNIT_W == 3) {
+          title = title.replace("Acc", "Disp");
+        }
+      }
+
+      options.title.text = title;
       options.container = document.getElementById(eventActive);
       options.data = drawsStore[eventActive].map((valueY, index) => ({
         y: valueY,

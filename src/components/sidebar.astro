@@ -5,10 +5,10 @@ import ButtonCollectData from "./buttonCollectData.astro";
 
 <!-- Navbar -->
 <nav
-  class="bg-blue-900 p-4 flex justify-between items-center top-0 left-0 w-full z-10"
+  class="bg-gray-100 text-blue-900 p-4 flex justify-between items-center top-0 left-0 w-full z-10"
 >
   <div class="flex gap-8">
-    <button id="menu-button" class="text-white focus:outline-none">
+    <button id="menu-button" class="focus:outline-none">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         class="h-6 w-6"
@@ -23,7 +23,7 @@ import ButtonCollectData from "./buttonCollectData.astro";
           d="M4 6h16M4 12h16m-7 6h7"></path>
       </svg>
     </button>
-    <div class="hidden md:block text-white text-2xl">Corel Force</div>
+    <div class="hidden md:block text-2xl">Corel Force</div>
   </div>
   <ButtonCollectData />
   <SwitchBluetooth />
@@ -32,7 +32,7 @@ import ButtonCollectData from "./buttonCollectData.astro";
   <!-- Sidebar -->
   <div
     id="sidebar"
-    class="z-20 fixed left-0 w-64 h-full bg-blue-900 text-white sidebar overflow-y-auto"
+    class="z-20 fixed left-0 w-64 h-full bg-gray-100 text-blue-900 sidebar overflow-y-auto"
   >
     <!-- Menús -->
     <ul id="plants-container"></ul>
@@ -41,7 +41,7 @@ import ButtonCollectData from "./buttonCollectData.astro";
       <div id="div-button-add-plant" class="p-4">
         <button
           id="add-plant"
-          class="border-white rounded-full border-2 px-4 py-1 hover:bg-white hover:text-blue-900"
+          class="border-blue-900 rounded-md border-2 px-4 py-1 text-blue-900 hover:text-white"
         >
           Add Plant
         </button>
@@ -247,7 +247,7 @@ import ButtonCollectData from "./buttonCollectData.astro";
     plants.filter(Boolean).forEach((plant) => {
       const plantButton = document.createElement("button");
       plantButton.className =
-        "w-full text-left py-2 px-1 bg-blue-800 focus:outline-none text-xs hover:bg-yellow-700 no-select";
+        "w-full text-left py-2 px-1 focus:outline-none text-blue-800 text-xs hover:bg-yellow-500 no-select";
       plantButton.dataset.name = "mplant-" + plant.id;
       plantButton.textContent = plant.description;
 
@@ -269,7 +269,7 @@ import ButtonCollectData from "./buttonCollectData.astro";
 
         const areaButton = document.createElement("button");
         areaButton.className =
-          "w-full text-left p-1 pl-2 bg-blue-700 focus:outline-none text-xs hover:bg-yellow-700";
+          "w-full text-left p-1 pl-2  focus:outline-none text-xs hover:bg-yellow-500";
         areaButton.dataset.name = "marea-" + area.id;
         areaButton.textContent = area.description;
 
@@ -291,7 +291,7 @@ import ButtonCollectData from "./buttonCollectData.astro";
 
           const systemButton = document.createElement("button");
           systemButton.className =
-            "w-full text-left p-1 pl-3 bg-blue-600 focus:outline-none text-xs hover:bg-yellow-700";
+            "w-full text-left p-1 pl-3 focus:outline-none text-xs hover:bg-yellow-500";
           systemButton.dataset.name = "msystem-" + system.id;
           systemButton.textContent = system.description;
 
@@ -320,7 +320,7 @@ import ButtonCollectData from "./buttonCollectData.astro";
               const mawoiLi = document.createElement("li");
               const mawoiButton = document.createElement("button");
               mawoiButton.className =
-                "w-full text-left p-1 pl-4 bg-white text-blue-900 focus:outline-none text-xs hover:bg-yellow-700 hover:text-white";
+                "w-full text-left p-1 pl-4 bg-white text-blue-900 focus:outline-none text-xs hover:bg-yellow-500";
               mawoiButton.dataset.name = "mmawoi-" + mawoi.id;
               mawoiButton.textContent = mawoi.description;
 
@@ -365,13 +365,13 @@ import ButtonCollectData from "./buttonCollectData.astro";
 
       const plantButtonDelete = document.createElement("button");
       plantButtonDelete.className =
-        "text-left p-2 bg-red-800 focus:outline-none text-sm hover:bg-red-600 w-[20px]";
+        "text-left p-2 mr-1 text-center bg-red-700 text-white focus:outline-none text-sm hover:bg-red-600 w-[20px]";
       plantButtonDelete.dataset.name = "bplant-" + plant.id;
       // symbol delete
       plantButtonDelete.textContent = "\u00D7";
 
       const plantDiv = document.createElement("div");
-      plantDiv.className = "flex bg-blue-800";
+      plantDiv.className = "flex font-semibold";
       plantDiv.appendChild(plantButton);
       plantDiv.appendChild(plantButtonDelete);
 

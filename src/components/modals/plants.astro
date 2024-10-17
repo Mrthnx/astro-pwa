@@ -99,10 +99,27 @@
           return;
         }
         showLoading();
-        fetch(URL_BACKEND + "/offline/points/" + plantId)
+        const token = localStorage.getItem("_token_") || "";
+        fetch(URL_BACKEND + "/offline/points/" + plantId, {
+          method: "GET",
+          headers: {
+            Authorization: "Bearer " + token,
+          },
+        })
           .then((response) => response.json())
-          .then((data) => data.data)
           .then((data) => {
+            if (!!data.ok && data.ok == false) {
+              return null;
+            }
+            return data.data;
+          })
+          .then((data) => {
+            if (!data) {
+              alert("Session expired, please login again");
+              localStorage.removeItem("_token_");
+              window.location.href = "/";
+              return;
+            }
             const plant = data[0];
             plants.push(plant);
             localStorage.setItem(
@@ -157,8 +174,20 @@
         },
       )
         .then((response) => response.json())
-        .then((data) => data.data)
         .then((data) => {
+          if (!!data.ok && data.ok == false) {
+            return null;
+          }
+          return data.data;
+        })
+        .then((data) => {
+          if (!data) {
+            alert("Session expired, please login again");
+            localStorage.removeItem("_token_");
+            window.location.href = "/";
+            return;
+          }
+
           const $tbody = document.getElementById("tbody-select-plant");
           $tbody.innerHTML = "";
           data.forEach((plant) => {

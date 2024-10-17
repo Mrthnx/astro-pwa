@@ -185,6 +185,7 @@
     }
 
     function syncSurveyInCloud() {
+      const token = localStorage.getItem("_token_") || "";
       let mawoisWith = localStorage.getItem("mawoisWithCollectData") || "[]";
       mawoisWith = JSON.parse(mawoisWith);
       if (!surveys || surveys.length == 0) {
@@ -198,15 +199,25 @@
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: "Bearer " + token,
           },
           body: JSON.stringify(survey),
         })
           .then((response) => response.json())
           .then((data) => {
+            if (!!data.ok && data.ok == false) {
+              return null;
+            }
             showLoading();
             return data.data;
           })
           .then((data) => {
+            if (!data) {
+              alert("Session expired, please login again");
+              localStorage.removeItem("_token_");
+              window.location.href = "/";
+              return;
+            }
             mawoisWith = mawoisWith.filter(
               (mawoi) => mawoi.id != data.mawoi.id,
             );

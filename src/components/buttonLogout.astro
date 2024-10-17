@@ -1,0 +1,15 @@
+<div>
+  <button
+    class="w-full rounded-md rounded-red-700 hover:bg-red-800 hover:text-white text-lg text-red-900 border-red-700 border-2 px-2 py-1"
+    id="logout"
+    onclick="logout()"
+  >
+    <span class="px-2">Logout</span>
+  </button>
+</div>
+<script is:inline>
+  function logout() {
+    localStorage.removeItem("_token_");
+    window.location.href = "/";
+  }
+</script>

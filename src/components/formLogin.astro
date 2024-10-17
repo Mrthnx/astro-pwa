@@ -1,0 +1,121 @@
+---
+import IconLogin from "../components/icons/login.astro";
+---
+
+<div
+  class="flex flex-col items-center justify-around w-[85vw] sm:w-[75vw] md:w-[50vh] h-[65vh] bg-white m-2 p-4 rounded-lg max-w-[305px]"
+>
+  <div class="flex flex-col justify-center items-center">
+    <img src="/corelusa.png" alt="Corelusa logo" class="w-16" />
+    <h1 class="text-blue-900 font-bold text-2xl">Corel Force</h1>
+  </div>
+  <div class="h-[40vh] w-full mb-4 p-2 rounded-lg flex flex-col justify-end">
+    <div>
+      <div>
+        <label for="input-email" class="text-blue-900 font-medium text-sm"
+          >Email</label
+        >
+        <input
+          id="input-email"
+          class="my-2 w-full placeholder-gray-500 bg-blue-200 text-blue-900 font-medium px-2 p-1 rounded-lg focus:ring-0 focus:outline-blue-700"
+          type="email"
+          placeholder="Enter your email"
+        />
+      </div>
+      <div>
+        <label for="input-email" class="text-blue-900 font-medium text-sm"
+          >Password</label
+        >
+        <input
+          id="input-password"
+          class="my-2 w-full placeholder-gray-500 bg-blue-200 text-blue-900 font-medium px-2 p-1 rounded-lg focus:ring-0 focus:outline-blue-700"
+          type="password"
+          placeholder="Enter your password"
+        />
+      </div>
+      <div class="mt-4">
+        <button
+          id="button-login"
+          onclick="login()"
+          class="w-full border-blue-800 border-2 text-blue-900 font-bold py-2 px-4 rounded-lg hover:bg-blue-800 hover:text-white flex items-center justify-center"
+        >
+          Login
+          <div class="pl-1">
+            <IconLogin />
+          </div>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<script is:inline>
+  const input_password = document.getElementById("input-password");
+  input_password.addEventListener("keyup", (event) => {
+    if (event.key === "Enter") {
+      login();
+    }
+  });
+
+  function login() {
+    let input_email = document.getElementById("input-email");
+    let input_password = document.getElementById("input-password");
+
+    const email = input_email.value;
+    let password = input_password.value;
+
+    if (!password || !email) {
+      alert("Email or Password invalid");
+      return;
+    }
+
+    if (!validateEmail(email)) {
+      alert("Invalid email format");
+      return;
+    }
+
+    password = CryptoJS.MD5(password).toString();
+    showLoading();
+    updateMessage("Login...");
+    fetch(URL_BACKEND + "/login-offline", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, password }),
+    })
+      .then((response) => response.json())
+      .then((response) => response.data)
+      .then((data) => {
+        if (!data) {
+          alert("Invalid email or password");
+          return;
+        }
+        input_email.value = "";
+        input_password.value = "";
+        localStorage.setItem("_token_", data);
+        window.location.href = "/dashboard";
+      })
+      .catch((error) => {
+        alert("Error connecting to server");
+        console.error("Error => ", error);
+      })
+      .finally(() => {
+        hideLoading();
+      });
+  }
+
+  function validateEmail(email) {
+    // Expresión regular para validar formato de correo electrónico
+    const regex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+    return regex.test(email);
+  }
+
+  function validatedToken() {
+    const token = localStorage.getItem("_token_");
+    if (token) {
+      window.location.href = "/dashboard";
+    }
+  }
+
+  validatedToken();
+</script>

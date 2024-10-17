@@ -1,5 +1,5 @@
-// const URL_BACKEND = "https://backend.pdmmonitor.com";
-const URL_BACKEND = "http://localhost:3000";
+const URL_BACKEND = "https://backend.pdmmonitor.com";
+// const URL_BACKEND = "http://localhost:3000";
 
 const OPTIONS_DRAW = {
   title: {

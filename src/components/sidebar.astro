@@ -144,6 +144,28 @@ import ButtonLogout from "./buttonLogout.astro";
     return null;
   }
 
+  function findPointForCollectData(id) {
+    let plantsStore = localStorage.getItem("plants") || "[]";
+    plantsStore = JSON.parse(plantsStore);
+    for (let plant of plantsStore) {
+      for (let area of plant.areas) {
+        for (let system of area.systems) {
+          for (let mawoi of system.mawois) {
+            for (let point of mawoi.points) {
+              if (point.id == id) {
+                return {
+                  mawoi,
+                  point,
+                };
+              }
+            }
+          }
+        }
+      }
+    }
+    return null;
+  }
+
   // Añadir el evento de click a cada botón
   function forEachButtonSidebar() {
     let pressTimer;

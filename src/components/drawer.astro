@@ -2,6 +2,7 @@
 import PopoverSetVar from "./popoverSetVar.astro";
 import PopoverWaveform from "./popoverWaveform.astro";
 import PopoverSpectrum from "./popoverSpectrum.astro";
+import ButtonRemoveCollect from "./buttonRemoveCollect.astro";
 ---
 
 <div class="drawer pt-2">
@@ -27,6 +28,7 @@ import PopoverSpectrum from "./popoverSpectrum.astro";
       </button>
     </div>
     <PopoverSetVar />
+    <ButtonRemoveCollect />
   </div>
   <div class="h-[520px]">
     <PopoverWaveform chartName="NEXT_X_W" />
@@ -182,14 +184,22 @@ import PopoverSpectrum from "./popoverSpectrum.astro";
       return acc;
     }, []);
     pointsCode.forEach((point) => {
+      const pointStore = findPointInCollectData(point.id);
+      let existPointStore = false;
+      if (pointStore && pointStore.point) {
+        existPointStore = true;
+      }
       const option = document.createElement("option");
       option.value = point.id;
       option.text = point.code;
+      if (existPointStore) {
+        option.selected = true;
+      }
       pointSelect.appendChild(option);
     });
-    const pointIdDefault = pointsCode[0].id;
-    drawByPointId(pointIdDefault);
 
+    const pointIdDefault = pointSelect.value;
+    drawByPointId(pointIdDefault);
     setDateByMawoiId(id, pointIdDefault);
   }
 
@@ -214,6 +224,19 @@ import PopoverSpectrum from "./popoverSpectrum.astro";
     const date = dateSelect.value;
     drawByPointId(pointSelect.value, date);
   });
+
+  function findPointInCollectData(pointId) {
+    let mawoisWithData = localStorage.getItem("mawoisWithCollectData") || "[]";
+    mawoisWithData = JSON.parse(mawoisWithData);
+    for (let mawoi of mawoisWithData) {
+      for (let point of mawoi.points) {
+        if (point.id == pointId) {
+          return { mawoi, point };
+        }
+      }
+    }
+    return null;
+  }
 
   function setDateByMawoiId(id, pointIdDefault) {
     const dateCollect = document.getElementById("date-collect");

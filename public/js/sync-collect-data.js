@@ -23,9 +23,10 @@ function groupPointsByDate(mawois, rangeInMinutes = 15) {
       } else {
         const lastPoint = currentGroup[currentGroup.length - 1];
         const minutesDiff = diffInMinutes(lastPoint.date, point.date);
+        const pointExistsInGroup = currentGroup.some((p) => p.id === point.id);
 
-        if (minutesDiff <= rangeInMinutes) {
-          // Si la diferencia es menor o igual a 15 minutos, agrégalo al grupo actual
+        if (minutesDiff <= rangeInMinutes && !pointExistsInGroup) {
+          // Si la diferencia es menor o igual a 15 minutos y el punto no existe en el grupo actual
           currentGroup.push(point);
         } else {
           // Si no, agrupa los puntos actuales y comienza un nuevo grupo

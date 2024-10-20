@@ -199,6 +199,28 @@ import ButtonRemoveCollect from "./buttonRemoveCollect.astro";
     });
 
     const pointIdDefault = pointSelect.value;
+
+    const pointOfPlant = findPointForCollectData(pointIdDefault);
+    if (pointOfPlant && pointOfPlant.point) {
+      const {
+        varRpm: rpm,
+        varFmax: fmax,
+        varLines: lines,
+        varRev: revolution,
+        varSamples: samples,
+      } = pointOfPlant.point;
+      localStorage.setItem(
+        "setVariables",
+        JSON.stringify({
+          rpm,
+          fmax,
+          lines,
+          revolution,
+          samples,
+        }),
+      );
+    }
+
     drawByPointId(pointIdDefault);
     setDateByMawoiId(id, pointIdDefault);
   }
@@ -207,6 +229,26 @@ import ButtonRemoveCollect from "./buttonRemoveCollect.astro";
 
   pointSelect.addEventListener("change", () => {
     const pointId = pointSelect.value;
+    const pointOfPlant = findPointForCollectData(pointId);
+    if (pointOfPlant && pointOfPlant.point) {
+      const {
+        varRpm: rpm,
+        varFmax: fmax,
+        varLines: lines,
+        varRev: revolution,
+        varSamples: samples,
+      } = pointOfPlant.point;
+      localStorage.setItem(
+        "setVariables",
+        JSON.stringify({
+          rpm,
+          fmax,
+          lines,
+          revolution,
+          samples,
+        }),
+      );
+    }
     drawByPointId(pointId);
     setDateByMawoiId(MAWOI_SELECTED.id, pointId);
   });

@@ -206,6 +206,10 @@
           .then((response) => response.json())
           .then((data) => {
             if (!!data.ok && data.ok == false) {
+              if (data.response && data.response.status == 500) {
+                alert("Server error, please try again later");
+                throw new Error("Server error");
+              }
               return null;
             }
             showLoading();
@@ -218,6 +222,7 @@
               window.location.href = "/";
               return;
             }
+            console.log("data", data);
             mawoisWith = mawoisWith.filter(
               (mawoi) => mawoi.id != data.mawoi.id,
             );

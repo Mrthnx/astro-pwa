@@ -109,6 +109,10 @@
           .then((response) => response.json())
           .then((data) => {
             if (!!data.ok && data.ok == false) {
+              if (data.response && data.response.status == 500) {
+                alert("Server error, please try again later");
+                throw new Error("Server error");
+              }
               return null;
             }
             return data.data;
@@ -176,6 +180,10 @@
         .then((response) => response.json())
         .then((data) => {
           if (!!data.ok && data.ok == false) {
+            if (data.response && data.response.status == 500) {
+              alert("Server error, please try again later");
+              throw new Error("Server error");
+            }
             return null;
           }
           return data.data;

@@ -3,33 +3,30 @@ import PopoverSetVar from "./popoverSetVar.astro";
 import PopoverWaveform from "./popoverWaveform.astro";
 import PopoverSpectrum from "./popoverSpectrum.astro";
 import ButtonRemoveCollect from "./buttonRemoveCollect.astro";
+import ButtonViewPhotos from "./buttonViewPhotos.astro";
 ---
 
 <div class="drawer pt-2">
-  <div class="flex justify-around items-center p-2 flex-wrap gap-1 w-full">
+  <div class="flex justify-between p-2 w-full">
     <!-- name mawoi in h2 --->
-    <div class="w-[250px]">
-      <select id="mawoi-select"></select>
+    <div class="flex justify-start gap-1 flex-wrap max-w-[260px] sm:max-w-full">
+      <div class="w-[250px]">
+        <select id="mawoi-select" onchange="handleChangeMawoi()"></select>
+      </div>
+      <div class="w-[80px]">
+        <select id="point-select" onchange="handleChangePoint()"></select>
+      </div>
+      <div class="w-[166px]">
+        <select id="date-collect" onchange="handleChangeDate()"></select>
+      </div>
     </div>
-    <div class="w-[80px]">
-      <select id="point-select"></select>
+    <div class="flex justify-end gap-1 flex-wrap">
+      <ButtonViewPhotos />
+      <PopoverSetVar />
+      <ButtonRemoveCollect />
     </div>
-    <div class="w-[180px]">
-      <select id="date-collect"></select>
-    </div>
-    <div class="w-[150px] -mt-[4px]">
-      <button
-        id="button-picture"
-        onclick="showImages()"
-        class="flex border-blue-800 hover:border-blue-900 text-blue-800 py-1 px-2 border-2 rounded-md bg-white"
-      >
-        <span class="px-2">Photos</span>
-        <img src="/icons/pictures.svg" alt="find pictures" class="w-6" />
-      </button>
-    </div>
-    <PopoverSetVar />
-    <ButtonRemoveCollect />
   </div>
+  <hr />
   <div class="h-[520px]">
     <PopoverWaveform chartName="NEXT_X_W" />
     <div id="NEXT_X_W" class="h-[250px]"></div>
@@ -62,6 +59,10 @@ import ButtonRemoveCollect from "./buttonRemoveCollect.astro";
   }
 </style>
 <script is:inline>
+  const pointSelect = document.getElementById("point-select");
+  const mawoiSelect = document.getElementById("mawoi-select");
+  const dateSelect = document.getElementById("date-collect");
+
   var MAWOI_SELECTED = null;
 
   var CHARTS = {
@@ -150,7 +151,6 @@ import ButtonRemoveCollect from "./buttonRemoveCollect.astro";
       plantId: plant.id,
       points,
     };
-    const mawoiSelect = document.getElementById("mawoi-select");
     mawoiSelect.innerHTML = "";
     const mawoisCode = system.mawois.reduce((acc, mawoi) => {
       const idx = acc.findIndex((p) => p.id === mawoi.id);
@@ -170,7 +170,6 @@ import ButtonRemoveCollect from "./buttonRemoveCollect.astro";
       mawoiSelect.appendChild(option);
     });
 
-    const pointSelect = document.getElementById("point-select");
     pointSelect.innerHTML = "";
     const pointsCode = points.reduce((acc, point) => {
       const codePoint = point.code.split("").slice(0, 2).join("");
@@ -225,9 +224,10 @@ import ButtonRemoveCollect from "./buttonRemoveCollect.astro";
     setDateByMawoiId(id, pointIdDefault);
   }
 
-  const pointSelect = document.getElementById("point-select");
-
-  pointSelect.addEventListener("change", () => {
+  function handleChangePoint() {
+    if (timeOutChangeMawoiOrPoint) {
+      clearTimeout(timeOutChangeMawoiOrPoint);
+    }
     const pointId = pointSelect.value;
     const pointOfPlant = findPointForCollectData(pointId);
     if (pointOfPlant && pointOfPlant.point) {
@@ -251,21 +251,27 @@ import ButtonRemoveCollect from "./buttonRemoveCollect.astro";
     }
     drawByPointId(pointId);
     setDateByMawoiId(MAWOI_SELECTED.id, pointId);
-  });
+  }
 
-  const mawoiSelect = document.getElementById("mawoi-select");
-  mawoiSelect.addEventListener("change", () => {
+  function handleChangeMawoi() {
+    if (timeOutChangeMawoiOrPoint) {
+      clearTimeout(timeOutChangeMawoiOrPoint);
+    }
+
     const mawoiId = mawoiSelect.value;
     const mawoiFind = findMawoiForCollectData(mawoiId);
     localStorage.setItem("mawoiSelected", JSON.stringify(mawoiFind.mawoi));
-    window.location.reload();
-  });
 
-  const dateSelect = document.getElementById("date-collect");
-  dateSelect.addEventListener("change", () => {
+    setInformationMawoi(mawoiFind.mawoi, mawoiFind.system, mawoiFind.plant);
+  }
+
+  function handleChangeDate() {
+    if (timeOutChangeMawoiOrPoint) {
+      clearTimeout(timeOutChangeMawoiOrPoint);
+    }
     const date = dateSelect.value;
     drawByPointId(pointSelect.value, date);
-  });
+  }
 
   function findPointInCollectData(pointId) {
     let mawoisWithData = localStorage.getItem("mawoisWithCollectData") || "[]";

@@ -1,11 +1,14 @@
-<div class="-mt-[4px]">
+---
+import IconVariables from "../components/icons/config.astro";
+---
+
+<div class="">
   <button
     id="get-vars"
-    class="flex border-blue-800 hover:border-blue-900 text-blue-800 py-1 px-2 border-2 rounded-md bg-white"
+    class="flex hover:bg-blue-800 border-blue-800 hover:text-white text-blue-800 p-1 border-2 rounded-md bg-white"
     onclick="toggleCustomPopover()"
   >
-    <span class="px-2">Config</span>
-    <img src="/icons/variables.svg" alt="get variables" class="w-6" />
+    <IconVariables />
   </button>
   <!-- Popover -->
   <div
@@ -68,6 +71,28 @@
           <option value="4096">4096</option>
         </select>
       </div>
+      <!-- chechbox and input number -->
+      <div class="flex gap-2 justify-evenly items-center">
+        <label for="check_time" class="text-white font-medium text-sm"
+          >waiting</label
+        >
+        <input
+          type="checkbox"
+          id="check_time"
+          checked
+          class="w-4 h-4 text-blue-900 rounded-full focus:outline-none focus:ring-0 focus:border-transparent"
+          onchange="handleCheckboxChange(event)"
+        />
+        <select
+          id="await_time"
+          class="text-blue-900 px-2 rounded-full focus:outline-none focus:ring-0 focus:border-transparent w-[100px]"
+        >
+          <option value="5">5</option>
+          <option selected value="10">10</option>
+          <option value="15">15</option>
+          <option value="20">20</option>
+        </select>
+      </div>
       <div class="p-2">
         <button
           onclick="saveVariables()"
@@ -91,12 +116,31 @@
   }
 </style>
 <script is:inline>
+  const awaitTimeStorage = localStorage.getItem("awaitTime");
+  if (!awaitTimeStorage) {
+    const valueAwaitTime = document.getElementById("await_time").value;
+    localStorage.setItem(
+      "awaitTime",
+      JSON.stringify({ value: valueAwaitTime, checked: true }),
+    );
+  }
+
+  function handleCheckboxChange(event) {
+    const checkTime = document.getElementById("check_time");
+    const awaitTime = document.getElementById("await_time");
+
+    awaitTime.disabled = !checkTime.checked;
+  }
+
   function saveVariables() {
     const rpm = +document.getElementById("rpm").value;
     const fmax = +document.getElementById("fmax").value;
     const lines = +document.getElementById("lines").value;
     const revolution = +document.getElementById("revolution").value;
     const samples = +document.getElementById("samples").value;
+
+    const valueAwaitTime = document.getElementById("await_time").value;
+    const checkedAwaitTime = document.getElementById("check_time").checked;
 
     if (+revolution > 24 || +revolution < 0) {
       alert("Revolution must be between 0 and 24");
@@ -106,6 +150,14 @@
     localStorage.setItem(
       "setVariables",
       JSON.stringify({ rpm, fmax, lines, revolution, samples }),
+    );
+
+    localStorage.setItem(
+      "awaitTime",
+      JSON.stringify({
+        value: valueAwaitTime ?? 10,
+        checked: checkedAwaitTime,
+      }),
     );
 
     showLoading();
@@ -118,6 +170,7 @@
 
   function setValuesForStorage() {
     const varStorage = localStorage.getItem("setVariables");
+    const awaitTimeStorage = localStorage.getItem("awaitTime");
     if (varStorage) {
       const variables = JSON.parse(varStorage);
       document.getElementById("rpm").value = variables.rpm;
@@ -125,6 +178,12 @@
       document.getElementById("lines").value = variables.lines;
       document.getElementById("revolution").value = variables.revolution;
       document.getElementById("samples").value = variables.samples;
+    }
+    if (awaitTimeStorage) {
+      const _awaitTime = JSON.parse(awaitTimeStorage);
+      document.getElementById("await_time").value = _awaitTime.value;
+      document.getElementById("await_time").disabled = !_awaitTime.checked;
+      document.getElementById("check_time").checked = _awaitTime.checked;
     }
   }
 
@@ -135,9 +194,17 @@
     const revolution = document.getElementById("revolution").value;
     const samples = document.getElementById("samples").value;
 
+    const valueAwaitTime = document.getElementById("await_time").value;
+    const checkedAwaitTime = document.getElementById("check_time").checked;
+
     localStorage.setItem(
       "setVariables",
       JSON.stringify({ rpm, fmax, lines, revolution, samples }),
+    );
+
+    localStorage.setItem(
+      "awaitTime",
+      JSON.stringify({ value: valueAwaitTime, checked: checkedAwaitTime }),
     );
   }
 

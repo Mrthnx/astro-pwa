@@ -187,6 +187,15 @@
         pointWithCollectData[eventActive + "_S"] = frequencyDomainData;
         drawAxios(eventActive + "_S"), 100;
         receivingData = false;
+
+        if (eventActive != "NEXT_Z") {
+          // call next function
+          eventActive = eventActive.includes("_X") ? "NEXT_Y" : "NEXT_Z";
+          writeOnCharacteristic("NEXT_X");
+        } else {
+          // set storage latest collect data
+          setLocalStorageLatestCollectData();
+        }
       }
     } else {
       // Asumir que son datos binarios

@@ -220,16 +220,17 @@
     function validateIfAllPointsAreCollected() {
       const awaitTimeStorage = JSON.parse(localStorage.getItem("awaitTime"));
       const valueAwaitTime = awaitTimeStorage.value;
+      const checkedAwaitTime = awaitTimeStorage.checked;
 
       const nextPoint = nextPointToCollect();
       const nextMawoi = nextMawoiToCollect();
 
-      if (nextPoint && nextPoint.id) {
+      if (nextPoint && nextPoint.id && checkedAwaitTime) {
         pointSelect.value = nextPoint.id;
         timeOutChangeMawoiOrPoint = setTimeout(() => {
           handleChangePoint();
         }, valueAwaitTime * 1000);
-      } else if (nextMawoi) {
+      } else if (nextMawoi && checkedAwaitTime) {
         mawoiSelect.value = nextMawoi;
         timeOutChangeMawoiOrPoint = setTimeout(() => {
           handleChangeMawoi();

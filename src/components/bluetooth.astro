@@ -184,7 +184,8 @@
         console.log("End data in frequency domain.");
         currentDataType = null;
         partialDataBuffer = new ArrayBuffer(0);
-        pointWithCollectData[eventActive + "_S"] = frequencyDomainData;
+        pointWithCollectData[eventActive + "_S"] =
+          processSpectra(frequencyDomainData);
         drawAxios(eventActive + "_S"), 100;
         receivingData = false;
 

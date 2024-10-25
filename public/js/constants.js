@@ -45,3 +45,13 @@ const DRAW_TITLES = {
 
 let UNIT_W = 1; // 1: Acc, 2: Vel, 3: Disp
 let UNIT_S = 1; // 1: Acc, 2: Vel, 3: Disp
+
+const PARAMS_SPEC = {
+  THRESHOLD: 0.055,
+  MULTIPLIER: 0.3,
+  A: 0.16,
+  B: 2.333,
+  C: 0.7,
+  D: 0.006,
+  FIXED: 0.000012,
+};

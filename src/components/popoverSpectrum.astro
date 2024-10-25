@@ -7,6 +7,15 @@ const { chartName } = Astro.props;
     <div
       class="cursor-pointer w-[98vw] pr-1 flex justify-end relative top-4 z-10 px-5 gap-6"
     >
+      <div class="text-blue-800">
+        <input
+          id="input-calculate"
+          type="text"
+          class="w-[150px] p-2 text-sm border-blue-800 outline-current border-2 rounded-md"
+          onblur={`calculateSpectrumFixed('${chartName}')`}
+          placeholder="calculate"
+        />
+      </div>
       <div>
         <button
           class="rounded-md border-2 border-blue-800"
@@ -82,6 +91,58 @@ const { chartName } = Astro.props;
     <p>Overall: ${overall}</p>
     `;
     charts_y = [];
+  }
+
+  function calculateSpectrumFixed(chartName) {
+    const inputCalculate = document.getElementById("input-calculate");
+    const valueCalculate = inputCalculate.value;
+    if (valueCalculate) {
+      showLoading();
+      let mawoisStore = localStorage.getItem("mawoisWithCollectData") || "[]";
+      mawoisStore = JSON.parse(mawoisStore);
+      if (mawoisStore.length == 0) {
+        hideLoading();
+        alert("Please draw the mawoi");
+        return;
+      }
+
+      const mawoiStore = mawoisStore.find(
+        (mawoi) => mawoi.id == MAWOI_SELECTED.id,
+      );
+      if (!mawoiStore) {
+        hideLoading();
+        alert("Please draw the mawoi");
+        return;
+      }
+
+      const pointSelected = document.getElementById("point-select").value;
+      const dateSelected = document.getElementById("date-collect").value;
+
+      const pointStore = mawoiStore.points.find(
+        (point) => point.id == pointSelected && point.date == dateSelected,
+      );
+
+      if (!pointStore) {
+        hideLoading();
+        alert("Please draw the point");
+        return;
+      }
+
+      if (!CHARTS[chartName]) {
+        hideLoading();
+        alert("First, draw the chart");
+        return;
+      }
+
+      pointStore[chartName] = processSpectra(
+        pointStore[chartName],
+        valueCalculate,
+      );
+
+      drawSimpleClear(chartName);
+      drawAxios(chartName, pointStore);
+      hideLoading();
+    }
   }
 
   function convertSpectrumDraws(chartName) {

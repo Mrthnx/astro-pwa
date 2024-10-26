@@ -204,3 +204,25 @@ function processSpectra(arr, fixedMultiplier) {
   // Convertir el resultado a una cadena separada por comas
   return result;
 }
+
+function processBandsInfo(rpm, velocitySpectra, bandParam) {
+  const records = velocitySpectra.filter(
+    (ds) =>
+      bandParam.lower * rpm < ds.vs_measure_x &&
+      ds.vs_measure_x < bandParam.upper * rpm,
+  );
+
+  const sum = records
+    .map((ds) => ds.vs_measure_y * ds.vs_measure_y)
+    .reduce((a, b) => a + b, 0);
+
+  const value = Math.sqrt(sum) * 1.0;
+  if (isNaN(value)) {
+    return null;
+  }
+  return {
+    biv_code: bandParam.code,
+    biv_label: bandParam.label,
+    biv_value: value,
+  };
+}

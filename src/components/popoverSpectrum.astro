@@ -35,7 +35,7 @@ const { chartName } = Astro.props;
         <!-- Popover -->
         <div
           id={`customPopoverSpectrum_${chartName}`}
-          class="absolute right-0 mt-2 top-4 w-48 p-4 bg-white rounded-lg shadow-lg border border-gray-200 z-20 hidden"
+          class="absolute right-0 mt-2 top-4 w-[200px] p-4 bg-white rounded-lg shadow-lg border border-gray-200 z-20 hidden"
         >
           <div id={`popoverSpectrumContent_${chartName}`}></div>
         </div>
@@ -68,6 +68,27 @@ const { chartName } = Astro.props;
     }
   }
   function toggleCustomPopoverSpectrum(chartName) {
+    console.log(chartName);
+    let pointInUse = findPointForCollectData(pointSelect.value);
+    pointInUse = pointInUse.point;
+
+    let bandsInfo = Object.values(pointInUse.bandsInfo);
+
+    let pointCode = pointInUse.code.substr(0, 2);
+    if (chartName.includes("_X")) {
+      bandsInfo = bandsInfo.filter((band) =>
+        [pointCode + "H", pointCode + "Y"].includes(band.pointCode),
+      );
+    } else if (chartName.includes("_Y")) {
+      bandsInfo = bandsInfo.filter((band) =>
+        [pointCode + "V", pointCode + "X"].includes(band.pointCode),
+      );
+    } else if (chartName.includes("_Z")) {
+      bandsInfo = bandsInfo.filter((band) =>
+        [pointCode + "A", pointCode + "Z"].includes(band.pointCode),
+      );
+    }
+
     if (!CHARTS[chartName]) {
       alert("First, draw the chart");
       return;
@@ -90,63 +111,27 @@ const { chartName } = Astro.props;
     popoverContent.innerHTML = `
     <p>Overall: ${overall}</p>
     `;
+
+    bandsInfo.forEach((band) => {
+      const charts = CHARTS[chartName].chart.data;
+      let velocities = spectraVelocity(charts.map((d) => d.y));
+
+      velocities = velocities.map((v, idx) => ({
+        vs_measure_x: charts[idx].x,
+        vs_measure_y: v,
+      }));
+
+      const bandInfo = processBandsInfo(1800, velocities, band);
+      console.log(bandInfo);
+      popoverContent.innerHTML += `
+<p> ${bandInfo.biv_code}: ${Math.round(bandInfo.biv_value * 1000) / 1000} </p>
+      `;
+    });
+
     charts_y = [];
   }
 
-  function calculateSpectrumFixed(chartName) {
-    const inputCalculate = document.getElementById("input-calculate");
-    const valueCalculate = inputCalculate.value;
-    if (valueCalculate) {
-      showLoading();
-      let mawoisStore = localStorage.getItem("mawoisWithCollectData") || "[]";
-      mawoisStore = JSON.parse(mawoisStore);
-      if (mawoisStore.length == 0) {
-        hideLoading();
-        alert("Please draw the mawoi");
-        return;
-      }
-
-      const mawoiStore = mawoisStore.find(
-        (mawoi) => mawoi.id == MAWOI_SELECTED.id,
-      );
-      if (!mawoiStore) {
-        hideLoading();
-        alert("Please draw the mawoi");
-        return;
-      }
-
-      const pointSelected = document.getElementById("point-select").value;
-      const dateSelected = document.getElementById("date-collect").value;
-
-      const pointStore = mawoiStore.points.find(
-        (point) => point.id == pointSelected && point.date == dateSelected,
-      );
-
-      if (!pointStore) {
-        hideLoading();
-        alert("Please draw the point");
-        return;
-      }
-
-      if (!CHARTS[chartName]) {
-        hideLoading();
-        alert("First, draw the chart");
-        return;
-      }
-
-      pointStore[chartName] = processSpectra(
-        pointStore[chartName],
-        valueCalculate,
-      );
-
-      drawSimpleClear(chartName);
-      drawAxios(chartName, pointStore);
-      hideLoading();
-    }
-  }
-
-  function convertSpectrumDraws(chartName) {
-    showLoading();
+  function getPointStore() {
     let mawoisStore = localStorage.getItem("mawoisWithCollectData") || "[]";
     mawoisStore = JSON.parse(mawoisStore);
     if (mawoisStore.length == 0) {
@@ -176,6 +161,45 @@ const { chartName } = Astro.props;
       alert("Please draw the point");
       return;
     }
+
+    return pointStore;
+  }
+
+  function calculateSpectrumFixed(chartName) {
+    const inputCalculate = document.getElementById("input-calculate");
+    const valueCalculate = inputCalculate.value;
+    if (valueCalculate) {
+      showLoading();
+
+      if (!CHARTS[chartName]) {
+        hideLoading();
+        alert("First, draw the chart");
+        return;
+      }
+
+      let pointStore = getPointStore();
+
+      pointStore[chartName] = processSpectra(
+        pointStore[chartName],
+        valueCalculate,
+      );
+
+      if (UNIT_S == 2) {
+        pointStore[chartName] = spectraVelocity(pointStore[chartName]);
+      } else if (UNIT_S == 3) {
+        pointStore[chartName] = spectraDisplacement(pointStore[chartName]);
+      }
+
+      drawSimpleClear(chartName);
+      drawAxios(chartName, pointStore);
+      hideLoading();
+    }
+  }
+
+  function convertSpectrumDraws(chartName) {
+    showLoading();
+
+    let pointStore = getPointStore();
 
     if (!CHARTS[chartName]) {
       hideLoading();

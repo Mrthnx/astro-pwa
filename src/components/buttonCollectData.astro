@@ -4,16 +4,15 @@
     onclick="startCollectData()"
     id="collectData">Collect Data</button
   >
-  <!-- <button -->
-  <!--   class="w-full rounded-md rounded-green-700 hover:bg-green-800 hover:text-white text-lg text-green-900 border-green-700 border-2 px-2 py-1" -->
-  <!--   onclick="setDataJS()" -->
-  <!-- > -->
-  <!--   TEST -->
-  <!-- </button> -->
+  <button
+    class="w-full rounded-md rounded-green-700 hover:bg-green-800 hover:text-white text-lg text-green-900 border-green-700 border-2 px-2 py-1"
+    onclick="setDataJS()"
+  >
+    TEST
+  </button>
 </div>
 <script is:inline>
   function setDataJS() {
-    console.log(M_NEXT_X_S);
     const surveys = JSON.parse(
       localStorage.getItem("mawoisWithCollectData") || "[]",
     );

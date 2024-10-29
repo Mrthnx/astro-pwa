@@ -13,17 +13,14 @@
 </div>
 <script is:inline>
   function setDataJS() {
-    const surveys = JSON.parse(
-      localStorage.getItem("mawoisWithCollectData") || "[]",
-    );
+    const surveys = getMawoisWithCollectDataStore();
 
     surveys[0].points[0].NEXT_X_S = M_NEXT_X_S.map((coord) => +coord.y);
     surveys[0].points[0].NEXT_X_W = M_NEXT_X_W.map((coord) => +coord.y);
 
-    localStorage.setItem("mawoisWithCollectData", JSON.stringify(surveys));
+    saveMawoisWithCollectDataStore(surveys);
   }
 
-  const collectData = document.getElementById("collectData");
   let timeOutChangeMawoiOrPoint = null;
 
   if (timeOutChangeMawoiOrPoint) {
@@ -51,27 +48,30 @@
   var eventActive = "NEXT_X";
 
   function startCollectData() {
-    mawoisWithCollectData =
-      localStorage.getItem("mawoisWithCollectData") || "[]";
-    mawoisWithCollectData = JSON.parse(mawoisWithCollectData);
+    clearTimeout(timeOutChangeMawoiOrPoint);
 
     if (!toggle.checked) {
       alert("Please turn on Bluetooth!");
       return;
     }
 
-    let setVariables = localStorage.getItem("setVariables");
+    const pointInStore = findPointInCollectData(pointSelect.value);
+    if (pointInStore) {
+      setBandsInformation(pointInStore.point);
+    }
+
+    mawoisWithCollectData = getMawoisWithCollectDataStore();
+
+    let setVariables = getVariablesStore();
     if (!setVariables) {
       setVariablesDefault();
-      setVariables = localStorage.getItem("setVariables");
+      setVariables = getVariablesStore();
     }
 
     if (MAWOI_SELECTED == null) {
       alert("Please select a mawoi!");
       return;
     }
-
-    setVariables = JSON.parse(setVariables);
 
     showLoading();
     updateMessage("Set variables");
@@ -101,8 +101,7 @@
   function processCollectData() {
     drawClear();
     showLoading();
-    let mawoiStore = localStorage.getItem("mawoiSelected");
-    mawoiStore = JSON.parse(mawoiStore);
+    let mawoiStore = getMawoiSelectedStore();
 
     idxMawoi = -1;
     if (mawoisWithCollectData && mawoisWithCollectData.length > 0) {
@@ -133,14 +132,117 @@
     pointWithCollectData.description =
       pointSelect.options[pointSelect.selectedIndex].text;
 
-    const vars = localStorage.getItem("setVariables");
+    const vars = getVariablesStore();
     if (vars) {
-      pointWithCollectData.vars = JSON.parse(vars);
+      pointWithCollectData.vars = vars;
     }
 
     showLoading();
     eventActive = "NEXT_X";
     writeOnCharacteristic("NEXT_X");
+  }
+
+  function saveOrUpdateBandInformationStore(bandInfoTemp) {
+    console.log("bandInfoTemp", bandInfoTemp);
+    const bandInfoIdx = searchBandInfoInStore(
+      bandInfoTemp.mawoiId,
+      bandInfoTemp.pointCode,
+      bandInfoTemp.date,
+    );
+    console.log("bandInfoIdx", bandInfoIdx);
+
+    if (bandInfoIdx < 0) {
+      addBandsInfoToStore(bandInfoTemp);
+    } else {
+      updateBandsInfoStore(bandInfoIdx, bandInfoTemp);
+    }
+  }
+
+  function calculateBandsInformationInCollectData(
+    waveform_y,
+    spectrum_y,
+    pointInUse,
+    FMAX,
+    COORD,
+  ) {
+    const bandsInfo = Object.values(pointInUse.bandsInfo);
+    const pointCode = pointInUse.code.substr(0, 2);
+    let bandInfoTemp = {
+      pointCode: pointCode + COORD,
+    };
+    let coords = [pointCode + "H", pointCode + "X"];
+    if (COORD == "Y") {
+      coords = [pointCode + "V", pointCode + "Y"];
+    } else if (COORD == "Z") {
+      coords = [pointCode + "A", pointCode + "Z"];
+    }
+    bandInfoTemp.crestFactor = roundedDecimal(crestFactor(waveform_y), 3);
+    bandInfoTemp.pkTopk = roundedDecimal(peakToPeak(waveform_y).pkTopk, 3);
+    bandInfoTemp.overall = roundedDecimal(calculateOverall(spectrum_y), 3);
+
+    const bandsInfoX = bandsInfo.filter((band) =>
+      coords.includes(band.pointCode),
+    );
+
+    bandsInfoX.forEach((band) => {
+      const data = spectrum_y;
+      let velocities = spectraVelocity(data);
+      velocities = velocities.map((v, idx) => ({
+        vs_measure_y: v,
+        vs_measure_x: (idx * FMAX) / spectrum_y.length,
+      }));
+
+      const bandInfo = processBandsInfo(pointInUse.rpm, velocities, band);
+      bandInfoTemp[bandInfo.biv_code] = roundedDecimal(bandInfo.biv_value, 3);
+    });
+
+    return bandInfoTemp;
+  }
+
+  function setBandsInformation(pointWithCollectData) {
+    let pointInUse = findPointForCollectData(pointSelect.value);
+    pointInUse = pointInUse.point;
+
+    const vars = pointWithCollectData.vars;
+    const FMAX = vars.fmax;
+
+    let bandInfoTemp = {
+      mawoiId: mawoiSelect.value,
+      date: dateSelect.value,
+    };
+
+    saveOrUpdateBandInformationStore({
+      ...bandInfoTemp,
+      ...calculateBandsInformationInCollectData(
+        pointWithCollectData.NEXT_X_W,
+        pointWithCollectData.NEXT_X_S,
+        pointInUse,
+        FMAX,
+        "X",
+      ),
+    });
+
+    saveOrUpdateBandInformationStore({
+      ...bandInfoTemp,
+      ...calculateBandsInformationInCollectData(
+        pointWithCollectData.NEXT_Y_W,
+        pointWithCollectData.NEXT_Y_S,
+        pointInUse,
+        FMAX,
+        "Y",
+      ),
+    });
+
+    saveOrUpdateBandInformationStore({
+      ...bandInfoTemp,
+      ...calculateBandsInformationInCollectData(
+        pointWithCollectData.NEXT_Z_W,
+        pointWithCollectData.NEXT_Z_S,
+        pointInUse,
+        FMAX,
+        "Z",
+      ),
+    });
   }
 
   function setLocalStorageLatestCollectData() {
@@ -150,13 +252,10 @@
     } else {
       mawoisWithCollectData.push({ ...mawoiWithCollectData });
     }
-    localStorage.setItem(
-      "mawoisWithCollectData",
-      JSON.stringify(mawoisWithCollectData),
-    );
 
-    let plantMemory = localStorage.getItem("plants") || "[]";
-    plantMemory = JSON.parse(plantMemory);
+    saveMawoisWithCollectDataStore(mawoisWithCollectData);
+
+    let plantMemory = getPlantsStore();
     plantMemory = plantMemory.filter(Boolean);
     if (plantMemory && plantMemory.length > 0) {
       createHierarchyList(plantMemory);
@@ -164,15 +263,12 @@
     }
 
     hideLoading();
-
     validateIfAllPointsAreCollected();
   }
 
   function nextPointToCollect() {
-    const _mawoiSelect = JSON.parse(localStorage.getItem("mawoiSelected"));
-    const _mawoisWithCollectData = JSON.parse(
-      localStorage.getItem("mawoisWithCollectData") || "[]",
-    );
+    const _mawoiSelect = getMawoiSelectedStore();
+    const _mawoisWithCollectData = getMawoisWithCollectDataStore();
     let pointsValidate = [];
     let idx = -1;
     if (_mawoisWithCollectData && _mawoisWithCollectData.length > 0) {
@@ -203,11 +299,9 @@
   }
 
   function nextMawoiToCollect() {
-    const _mawoisWithCollectData = JSON.parse(
-      localStorage.getItem("mawoisWithCollectData") || "[]",
-    );
+    const _mawoisWithCollectData = getMawoisWithCollectDataStore();
     let mawoisValidate = _mawoisWithCollectData.map((mawoi) => mawoi.id);
-    const plantMemory = JSON.parse(localStorage.getItem("plants") || "[]");
+    const plantMemory = getPlantsStore();
     let mawoiUnique = [];
     for (let plant of plantMemory) {
       for (let area of plant.areas) {
@@ -235,7 +329,7 @@
   // validate if all points are collected
   // when all points are collected, next mawoi empty
   function validateIfAllPointsAreCollected() {
-    const awaitTimeStorage = JSON.parse(localStorage.getItem("awaitTime"));
+    const awaitTimeStorage = getAwaitTimeStore();
     const valueAwaitTime = awaitTimeStorage.value;
     const checkedAwaitTime = awaitTimeStorage.checked;
 
@@ -245,18 +339,24 @@
     if (nextPoint && nextPoint.id && checkedAwaitTime) {
       pointSelect.value = nextPoint.id;
       timeOutChangeMawoiOrPoint = setTimeout(() => {
+        showLoading();
+        updateMessage("Next point ...");
         handleChangePoint();
+        hideLoading();
       }, valueAwaitTime * 1000);
     } else if (nextMawoi && checkedAwaitTime) {
       mawoiSelect.value = nextMawoi;
       timeOutChangeMawoiOrPoint = setTimeout(() => {
+        showLoading();
+        updateMessage("Next mawoi...");
         handleChangeMawoi();
+        hideLoading();
       }, valueAwaitTime * 1000);
     }
   }
 
   function uniquePoints() {
-    const _mawoiSelect = JSON.parse(localStorage.getItem("mawoiSelected"));
+    const _mawoiSelect = getMawoiSelectedStore();
     if (!_mawoiSelect) {
       return [];
     }
@@ -266,7 +366,7 @@
   }
 
   function getPointInMawoiSelect(code) {
-    const _mawoiSelect = JSON.parse(localStorage.getItem("mawoiSelected"));
+    const _mawoiSelect = getMawoiSelectedStore();
     return _mawoiSelect.points.find((point) => point.code.includes(code));
   }
 </script>

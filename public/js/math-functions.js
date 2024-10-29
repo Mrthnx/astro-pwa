@@ -2,6 +2,10 @@ function roundDecimals(val) {
   return Math.round(val * 1000) / 1000;
 }
 
+function roundedDecimal(value, decimals) {
+  return Math.round(value * 10 ** decimals) / 10 ** decimals;
+}
+
 function peakToPeak(arr) {
   const valMaxY = Math.max(...arr);
   const valMinY = Math.min(...arr);

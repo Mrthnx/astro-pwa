@@ -277,7 +277,9 @@ import ButtonViewPhotos from "./buttonViewPhotos.astro";
     let mawoisWithData = localStorage.getItem("mawoisWithCollectData") || "[]";
     mawoisWithData = JSON.parse(mawoisWithData);
     for (let mawoi of mawoisWithData) {
-      for (let point of mawoi.points) {
+      // order points by date desc
+      const points = mawoi.points.sort((a, b) => b.date - a.date);
+      for (let point of points) {
         if (point.id == pointId) {
           return { mawoi, point };
         }

@@ -35,7 +35,7 @@ const { chartName } = Astro.props;
         <!-- Popover -->
         <div
           id={`customPopoverSpectrum_${chartName}`}
-          class="absolute right-0 mt-2 top-4 w-[200px] p-4 bg-white rounded-lg shadow-lg border border-gray-200 z-20 hidden"
+          class="absolute right-0 mt-2 top-4 w-[250px] p-4 bg-white rounded-lg shadow-lg border border-gray-200 z-20 hidden"
         >
           <div id={`popoverSpectrumContent_${chartName}`}></div>
         </div>
@@ -68,7 +68,11 @@ const { chartName } = Astro.props;
     }
   }
   function toggleCustomPopoverSpectrum(chartName) {
-    console.log(chartName);
+    if (!CHARTS[chartName]) {
+      alert("First, draw the chart");
+      return;
+    }
+
     let pointInUse = findPointForCollectData(pointSelect.value);
     pointInUse = pointInUse.point;
 
@@ -89,11 +93,6 @@ const { chartName } = Astro.props;
       );
     }
 
-    if (!CHARTS[chartName]) {
-      alert("First, draw the chart");
-      return;
-    }
-
     const popover = document.getElementById(
       `customPopoverSpectrum_${chartName}`,
     );
@@ -104,13 +103,21 @@ const { chartName } = Astro.props;
 
     const overall = calculateOverall(charts_y);
 
+    const lastBandsInfo = getLastBandsInfoFromStore(chartName);
+
     // Mostrar los valores en el popover
     const popoverContent = document.getElementById(
       `popoverSpectrumContent_${chartName}`,
     );
-    popoverContent.innerHTML = `
-    <p>Overall: ${overall}</p>
+
+    if (lastBandsInfo) {
+      popoverContent.innerHTML = `
+<p>Overall (${lastBandsInfo.overall}) : ${overall}</p>
     `;
+    } else {
+      popoverContent.innerHTML = `
+<p>Overall: ${overall}</p> `;
+    }
 
     bandsInfo.forEach((band) => {
       const charts = CHARTS[chartName].chart.data;
@@ -121,19 +128,22 @@ const { chartName } = Astro.props;
         vs_measure_y: v,
       }));
 
-      const bandInfo = processBandsInfo(1800, velocities, band);
-      console.log(bandInfo);
-      popoverContent.innerHTML += `
-<p> ${bandInfo.biv_code}: ${Math.round(bandInfo.biv_value * 1000) / 1000} </p>
+      const bandInfo = processBandsInfo(pointInUse.rpm, velocities, band);
+      if (lastBandsInfo) {
+        popoverContent.innerHTML += `
+<p> ${bandInfo.biv_code} (${lastBandsInfo[bandInfo.biv_code]}) : ${roundedDecimal(bandInfo.biv_value, 3)} </p> `;
+      } else {
+        popoverContent.innerHTML += `
+<p> ${bandInfo.biv_code}: ${roundedDecimal(bandInfo.biv_value, 3)} </p>
       `;
+      }
     });
 
     charts_y = [];
   }
 
   function getPointStore() {
-    let mawoisStore = localStorage.getItem("mawoisWithCollectData") || "[]";
-    mawoisStore = JSON.parse(mawoisStore);
+    let mawoisStore = getMawoisWithCollectDataStore();
     if (mawoisStore.length == 0) {
       hideLoading();
       alert("Please draw the mawoi");

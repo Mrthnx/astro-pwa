@@ -143,13 +143,11 @@
   }
 
   function saveOrUpdateBandInformationStore(bandInfoTemp) {
-    console.log("bandInfoTemp", bandInfoTemp);
     const bandInfoIdx = searchBandInfoInStore(
       bandInfoTemp.mawoiId,
       bandInfoTemp.pointCode,
       bandInfoTemp.date,
     );
-    console.log("bandInfoIdx", bandInfoIdx);
 
     if (bandInfoIdx < 0) {
       addBandsInfoToStore(bandInfoTemp);

@@ -166,6 +166,30 @@ import ButtonLogout from "./buttonLogout.astro";
     return null;
   }
 
+  function findPointForCollectDataByCode(mawoiId, pointsCode) {
+    let plantsStore = localStorage.getItem("plants") || "[]";
+    plantsStore = JSON.parse(plantsStore);
+    for (let plant of plantsStore) {
+      for (let area of plant.areas) {
+        for (let system of area.systems) {
+          for (let mawoi of system.mawois) {
+            if (mawoi.id == mawoiId) {
+              for (let point of mawoi.points) {
+                if (pointsCode.includes(point.code)) {
+                  return {
+                    mawoi,
+                    point,
+                  };
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    return null;
+  }
+
   // Añadir el evento de click a cada botón
   function forEachButtonSidebar() {
     let pressTimer;

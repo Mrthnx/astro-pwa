@@ -64,7 +64,27 @@ const { chartName } = Astro.props;
       return;
     }
 
-    const lastBandsInfo = getLastBandsInfoFromStore(chartName);
+    let pointInUse = findPointForCollectData(pointSelect.value);
+    pointInUse = pointInUse.point;
+
+    let pointCode = pointInUse.code.substr(0, 2);
+    let pointsCode = [pointCode + "H", pointCode + "X"];
+
+    if (chartName.includes("_Y")) {
+      pointsCode = [pointCode + "V", pointCode + "Y"];
+    } else if (chartName.includes("_Z")) {
+      pointsCode = [pointCode + "A", pointCode + "Z"];
+    }
+
+    let lastBandsInfo = getLastBandsInfoFromStore(chartName);
+    const pointForBands = findPointForCollectDataByCode(
+      mawoiSelect.value,
+      pointsCode,
+    );
+
+    if (!lastBandsInfo && pointForBands && pointForBands.point) {
+      lastBandsInfo = pointForBands.point.lastBandInfo;
+    }
 
     const popover = document.getElementById(
       `customPopoverWaveform_${chartName}`,
@@ -85,7 +105,7 @@ const { chartName } = Astro.props;
     if (lastBandsInfo) {
       popoverContent.innerHTML = `
 <p>Crest Factor (${lastBandsInfo.crestFactor}) : ${_crestFactor}</p>
-    <p>Pk-Pk (${lastBandsInfo.pkTopk}) : ${pkTopk}</p>
+    <p>Pk-Pk (${lastBandsInfo.pkTopk || lastBandsInfo.peakToPeak}) : ${pkTopk}</p>
     `;
     } else {
       popoverContent.innerHTML = `

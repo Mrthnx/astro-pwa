@@ -35,9 +35,11 @@ const { chartName } = Astro.props;
         <!-- Popover -->
         <div
           id={`customPopoverSpectrum_${chartName}`}
-          class="absolute right-0 mt-2 top-4 w-[250px] p-4 bg-white rounded-lg shadow-lg border border-gray-200 z-20 hidden"
+          class="absolute right-0 mt-2 top-4 w-[250px] p-4 bg-white rounded-lg shadow-lg border border-gray-200 z-30
+          hidden max-h-[200px] overflow-y-auto"
         >
-          <div id={`popoverSpectrumContent_${chartName}`}></div>
+          <div id={`popoverSpectrumContent_${chartName}`} class="text-right">
+          </div>
         </div>
       </div>
     </div>
@@ -74,7 +76,6 @@ const { chartName } = Astro.props;
     }
 
     let pointInUse = findPointForCollectData(pointSelect.value);
-    console.log("pointInUse", pointInUse);
     pointInUse = pointInUse.point;
 
     let bandsInfo = Object.values(pointInUse.bandsInfo);
@@ -126,7 +127,8 @@ const { chartName } = Astro.props;
 
     if (lastBandsInfo) {
       popoverContent.innerHTML = `
-<p>Overall (${lastBandsInfo.overall}) : ${overall}</p>
+<p style="font-size: 20px">Overall ${overall}</p>
+<span style="font-size: 15px"> Last measure ${lastBandsInfo.overall} </span>
     `;
     } else {
       popoverContent.innerHTML = `
@@ -145,7 +147,8 @@ const { chartName } = Astro.props;
       const bandInfo = processBandsInfo(pointInUse.rpm, velocities, band);
       if (lastBandsInfo) {
         popoverContent.innerHTML += `
-<p> ${bandInfo.biv_code} (${lastBandsInfo[bandInfo.biv_code]}) : ${roundedDecimal(bandInfo.biv_value, 3)} </p> `;
+<p style="font-size: 20px"> ${bandInfo.biv_code} ${roundedDecimal(bandInfo.biv_value, 3)} </p>
+<span style="font-size: 15px"> Last measure ${lastBandsInfo[bandInfo.biv_code]} </span> `;
       } else {
         popoverContent.innerHTML += `
 <p> ${bandInfo.biv_code}: ${roundedDecimal(bandInfo.biv_value, 3)} </p>

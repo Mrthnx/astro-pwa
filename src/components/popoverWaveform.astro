@@ -28,7 +28,8 @@ const { chartName } = Astro.props;
           id={`customPopoverWaveform_${chartName}`}
           class="absolute right-0 mt-2 top-4 w-[250px] p-4 bg-white rounded-lg shadow-lg border border-gray-200 z-20 hidden"
         >
-          <div id={`popoverWaveformContent_${chartName}`}></div>
+          <div id={`popoverWaveformContent_${chartName}`} class="text-right">
+          </div>
         </div>
       </div>
     </div>
@@ -104,8 +105,10 @@ const { chartName } = Astro.props;
     );
     if (lastBandsInfo) {
       popoverContent.innerHTML = `
-<p>Crest Factor (${lastBandsInfo.crestFactor}) : ${_crestFactor}</p>
-    <p>Pk-Pk (${lastBandsInfo.pkTopk || lastBandsInfo.peakToPeak}) : ${pkTopk}</p>
+<p style="font-size: 20px">Crest Factor ${_crestFactor}</p> 
+<span style="font-size: 15px"> Last measure ${lastBandsInfo.crestFactor} </span>
+<p style="font-size: 20px">Pk-Pk ${pkTopk}</p>
+<span style="font-size: 15px"> Last measure ${lastBandsInfo.pkTopk || lastBandsInfo.peakToPeak} </span>
     `;
     } else {
       popoverContent.innerHTML = `

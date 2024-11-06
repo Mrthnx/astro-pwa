@@ -1,0 +1,161 @@
+<div
+  id="modal-system-config"
+  class="fixed inset-0 flex flex-col items-center justify-center bg-black bg-opacity-50 z-20 hidden"
+>
+  <div
+    class="bg-white rounded-lg p-4 w-10/12 max-w-md h-[70vh] overflow-y-auto"
+  >
+    <div class="w-full flex justify-end">
+      <button
+        id="close-modal-system"
+        onclick="hideModalSystemConfig()"
+        class="w-[30px] bg-red-700 text-white rounded-full px-2"
+      >
+        x
+      </button>
+    </div>
+
+    <div>
+      <h1 class="text-center font-medium text-lg">System Config</h1>
+      <div class="flex flex-col gap-2">
+        <div>
+          <label for="amplitude" class="text-blue-900 font-medium text-sm"
+            >Amplitude</label
+          >
+          <select
+            id="amplitude"
+            class="w-full text-blue-900 px-2 border-blue-800 outline-current border-2 rounded-md"
+          >
+            <option value="1">Metric</option>
+            <option value="2" selected>English</option>
+          </select>
+        </div>
+        <div>
+          <label for="acc_type" class="text-blue-900 font-medium text-sm"
+            >Acceleration Type</label
+          >
+          <select
+            id="acc_type"
+            class="w-full text-blue-900 px-2 border-blue-800 outline-current border-2 rounded-md"
+          >
+            <option value="1">Peak</option>
+            <option value="2" selected>Peak to Peak</option>
+            <option value="3">RMS</option>
+          </select>
+        </div>
+        <div>
+          <label for="vel_type" class="text-blue-900 font-medium text-sm"
+            >Velocity Type</label
+          >
+          <select
+            id="vel_type"
+            class="w-full text-blue-900 px-2 border-blue-800 outline-current border-2 rounded-md"
+          >
+            <option value="1">Peak</option>
+            <option value="2" selected>Peak to Peak</option>
+            <option value="3">RMS</option>
+          </select>
+        </div>
+        <div>
+          <label for="dis_type" class="text-blue-900 font-medium text-sm"
+            >Displacement Type</label
+          >
+          <select
+            id="dis_type"
+            class="w-full text-blue-900 px-2 border-blue-800 outline-current border-2 rounded-md"
+          >
+            <option value="1">Peak</option>
+            <option value="2" selected>Peak to Peak</option>
+            <option value="3">RMS</option>
+          </select>
+        </div>
+        <div>
+          <label for="frequency" class="text-blue-900 font-medium text-sm"
+            >Frequency</label
+          >
+          <select
+            id="frequency"
+            class="w-full text-blue-900 px-2 border-blue-800 outline-current border-2 rounded-md"
+          >
+            <option value="1">Hertz (Hz)</option>
+            <option value="2" selected>CPM</option>
+          </select>
+        </div>
+        <br />
+        <div>
+          <button
+            class="w-full bg-blue-800 hover:bg-blue-900 text-white py-1 px-2 rounded-lg justify-center"
+            onclick="saveSystemConfig()"
+          >
+            Save Configuration
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script is:inline>
+  $modalSystemConfig = document.getElementById("modal-system-config");
+  $btnCloseModalSystem = document.getElementById("close-modal-system");
+
+  function hideModalSystemConfig() {
+    $modalSystemConfig?.classList.add("hidden");
+    hideLoading();
+  }
+
+  function showModalSystemConfig() {
+    $modalSystemConfig?.classList.remove("hidden");
+    validateSystemConfig();
+  }
+
+  function validateSystemConfig() {
+    let configStore = getSystemConfigStore();
+    if (!configStore) {
+      saveSystemConfigDefault();
+      configStore = getSystemConfigStore();
+    }
+    setInformationSystemConfig(configStore);
+  }
+
+  function saveSystemConfigDefault() {
+    const configStore = {
+      amplitude: 2,
+      acc_type: 2,
+      vel_type: 2,
+      dis_type: 2,
+      frequency: 2,
+    };
+    saveSystemConfigStore(configStore);
+  }
+
+  function setInformationSystemConfig(configStore) {
+    const amplitude = document.getElementById("amplitude");
+    const acc_type = document.getElementById("acc_type");
+    const vel_type = document.getElementById("vel_type");
+    const dis_type = document.getElementById("dis_type");
+    const frequency = document.getElementById("frequency");
+
+    amplitude.value = configStore.amplitude;
+    acc_type.value = configStore.acc_type;
+    vel_type.value = configStore.vel_type;
+    dis_type.value = configStore.dis_type;
+    frequency.value = configStore.frequency;
+  }
+
+  function saveSystemConfig() {
+    const amplitude = document.getElementById("amplitude").value;
+    const acc_type = document.getElementById("acc_type").value;
+    const vel_type = document.getElementById("vel_type").value;
+    const dis_type = document.getElementById("dis_type").value;
+    const frequency = document.getElementById("frequency").value;
+    saveSystemConfigStore({
+      amplitude,
+      acc_type,
+      vel_type,
+      dis_type,
+      frequency,
+    });
+    hideModalSystemConfig();
+  }
+</script>

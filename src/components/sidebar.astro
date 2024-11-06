@@ -1,7 +1,8 @@
 ---
 import SwitchBluetooth from "./switchBluetooth.astro";
-import ButtonCollectData from "./buttonCollectData.astro";
-import ButtonLogout from "./buttonLogout.astro";
+import ButtonCollectData from "./buttons/buttonCollectData.astro";
+import ButtonLogout from "./buttons/buttonLogout.astro";
+import ButtonSystemConfig from "./buttons/buttonSystemConfig.astro";
 ---
 
 <!-- Navbar -->
@@ -50,6 +51,7 @@ import ButtonLogout from "./buttonLogout.astro";
     </div>
 
     <div class="flex relative -bottom-10 justify-center items-end">
+      <ButtonSystemConfig />
       <ButtonLogout />
     </div>
 

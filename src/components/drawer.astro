@@ -2,8 +2,8 @@
 import PopoverSetVar from "./popoverSetVar.astro";
 import PopoverWaveform from "./popoverWaveform.astro";
 import PopoverSpectrum from "./popoverSpectrum.astro";
-import ButtonRemoveCollect from "./buttonRemoveCollect.astro";
-import ButtonViewPhotos from "./buttonViewPhotos.astro";
+import ButtonRemoveCollect from "./buttons/buttonRemoveCollect.astro";
+import ButtonViewPhotos from "./buttons/buttonViewPhotos.astro";
 ---
 
 <div class="drawer pt-2">
@@ -110,15 +110,50 @@ import ButtonViewPhotos from "./buttonViewPhotos.astro";
         }
       }
 
+      const configStore = getSystemConfigStore();
+
       options.title.text = title;
       options.container = document.getElementById(eventActive);
-      options.data = drawsStore[eventActive].map((valueY, index) => ({
-        y: valueY,
-        x: eventActive.includes("_S")
+      options.data = drawsStore[eventActive].map((valueY, index) => {
+        let y = valueY;
+        let x = eventActive.includes("_S")
           ? (index * FMAX) / drawsStore[eventActive].length
           : (index * MIN_TO_SECONDS * nRevs) /
-            (RPM * drawsStore[eventActive].length),
-      }));
+            (RPM * drawsStore[eventActive].length);
+
+        if (configStore.frequency == 1) {
+          x = x / 60; // Convert to Hertz
+        }
+
+        if (configStore.amplitude == 1) {
+          y = y * 25.4; // Convert to metric
+        }
+
+        const factorMap = {
+          1: 0.5,
+          3: 0.35355,
+        };
+
+        const unitType = eventActive.includes("_S") ? UNIT_S : UNIT_W;
+        let typeKey;
+
+        if (unitType === 1) {
+          typeKey = "acc_type";
+        } else if (unitType === 2) {
+          typeKey = "vel_type";
+        } else if (unitType === 3) {
+          typeKey = "dis_type";
+        }
+
+        if (typeKey && factorMap[configStore[typeKey]]) {
+          y *= factorMap[configStore[typeKey]];
+        }
+
+        return {
+          y,
+          x,
+        };
+      });
       CHARTS[eventActive] = agCharts.AgCharts.create({ ...options });
     }
   }

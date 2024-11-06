@@ -6,6 +6,7 @@ import Drawer from "../components/drawer.astro";
 import ModalPlants from "../components/modals/plants.astro";
 import ModalPictures from "../components/modals/pictures-mawoi.astro";
 import ModalSyncCollect from "../components/modals/sync-collect-data.astro";
+import ModalSystemConfig from "../components/modals/system-config.astro";
 ---
 
 <Layout title="Dashboard">
@@ -18,12 +19,13 @@ import ModalSyncCollect from "../components/modals/sync-collect-data.astro";
       <ModalPlants />
       <ModalPictures />
       <ModalSyncCollect />
+      <ModalSystemConfig />
       <Drawer />
     </div>
   </div>
   <script is:inline>
     const token = localStorage.getItem("_token_") || "";
-    if(!token) {
+    if (!token) {
       window.location.href = "/";
     }
   </script>

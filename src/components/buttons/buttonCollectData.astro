@@ -12,6 +12,86 @@
   <!-- </button> -->
 </div>
 <script is:inline>
+  var currentDataType = null; // 'time_domain' o 'frequency_domain'
+  var partialDataBuffer = new ArrayBuffer(0);
+  var timeDomainData = [];
+  var frequencyDomainData = [];
+  var markers = [
+    "END",
+    "TIME_DOMAIN",
+    "END_TIME_DOMAIN",
+    "FREQUENCY_DOMAIN",
+    "END_FREQUENCY_DOMAIN",
+  ];
+
+  function onEventsBluetooth(dataBuffer, message) {
+    if (message && markers.includes(message)) {
+      console.log("Received data...", message);
+      if (message === "TIME_DOMAIN") {
+        console.log("Init data in time domain.");
+        updateMessage(eventActive);
+        currentDataType = "time_domain";
+        timeDomainData = [];
+        partialDataBuffer = new ArrayBuffer(0);
+      } else if (message === "END_TIME_DOMAIN") {
+        console.log("End data in time domain.");
+        currentDataType = null;
+        partialDataBuffer = new ArrayBuffer(0);
+        pointWithCollectData[eventActive + "_W"] = timeDomainData;
+        drawAxios(eventActive + "_W"), 100;
+      } else if (message === "FREQUENCY_DOMAIN") {
+        console.log("Init data in frequency domain.");
+        updateMessage(eventActive);
+        currentDataType = "frequency_domain";
+        frequencyDomainData = [];
+        partialDataBuffer = new ArrayBuffer(0);
+      } else if (message === "END_FREQUENCY_DOMAIN") {
+        console.log("End data in frequency domain.");
+        currentDataType = null;
+        partialDataBuffer = new ArrayBuffer(0);
+        pointWithCollectData[eventActive + "_S"] =
+          processSpectra(frequencyDomainData);
+        drawAxios(eventActive + "_S"), 100;
+        receivingData = false;
+
+        if (eventActive != "NEXT_Z") {
+          // call next function
+          eventActive = eventActive.includes("_X") ? "NEXT_Y" : "NEXT_Z";
+          writeOnCharacteristic(eventActive);
+        } else {
+          // set storage latest collect data
+          setLocalStorageLatestCollectData();
+        }
+      }
+    } else {
+      // Asumir que son datos binarios
+      if (
+        currentDataType === "time_domain" ||
+        currentDataType === "frequency_domain"
+      ) {
+        partialDataBuffer = concatBuffers(partialDataBuffer, dataBuffer.buffer);
+
+        // Desempaquetar los doubles cuando tengamos suficientes bytes
+        while (partialDataBuffer.byteLength >= 8) {
+          const chunk = partialDataBuffer.slice(0, 8);
+          partialDataBuffer = partialDataBuffer.slice(8);
+
+          const miniDataView = new DataView(chunk);
+
+          const value = miniDataView.getFloat64(0, true);
+
+          if (currentDataType === "time_domain") {
+            timeDomainData.push(value);
+          } else if (currentDataType === "frequency_domain") {
+            frequencyDomainData.push(value);
+          }
+        }
+      } else {
+        console.log("Datos binarios recibidos sin tipo específico. Ignorando.");
+      }
+    }
+  }
+
   function setDataJS() {
     const surveys = getMawoisWithCollectDataStore();
 

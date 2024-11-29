@@ -1,0 +1,19 @@
+---
+import IconTestSensor from "../icons/test.astro";
+---
+
+<div class="cursor-pointer" id="redirect-to-test-sensor">
+  <IconTestSensor />
+</div>
+
+<script is:inline>
+  const $redirectToTestSensor = document.getElementById(
+    "redirect-to-test-sensor",
+  );
+  if ($redirectToTestSensor) {
+    $redirectToTestSensor.addEventListener("click", redirectToTestSensor);
+  }
+  function redirectToTestSensor() {
+    window.location.href = "/test-sensor";
+  }
+</script>

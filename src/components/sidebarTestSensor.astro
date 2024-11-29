@@ -1,0 +1,97 @@
+---
+import ButtonSystemConfig from "./buttons/buttonSystemConfig.astro";
+import ButtonLogout from "./buttons/buttonLogout.astro";
+import SwitchBluetooth from "./switchBluetooth.astro";
+import ButtonCollectSensor from "./buttons/buttonCollectSensor.astro";
+---
+
+<!-- Navbar -->
+<nav
+  class="bg-gray-100 text-blue-900 p-4 flex justify-between items-center top-0 left-0 w-full z-10"
+>
+  <div class="flex gap-8">
+    <button id="menu-button" class="focus:outline-none">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-6 w-6"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M4 6h16M4 12h16m-7 6h7"></path>
+      </svg>
+    </button>
+    <div class="hidden md:block text-2xl">Corel Force</div>
+  </div>
+  <ButtonCollectSensor />
+  <SwitchBluetooth />
+</nav>
+<div class="flex">
+  <!-- Sidebar -->
+  <div
+    id="sidebar"
+    class="z-20 fixed left-0 w-64 h-full bg-gray-100 text-blue-900 sidebar overflow-y-auto"
+  >
+    <!-- Menús -->
+    <ul id="plants-container"></ul>
+
+    <!-- <div class="flex justify-center items-center"> -->
+    <!--   <div id="div-button-add-plant" class="p-4"> -->
+    <!--     <button -->
+    <!--       id="add-plant" -->
+    <!--       class="border-blue-900 rounded-md border-2 px-4 py-1 text-blue-900 hover:bg-blue-800 hover:text-white" -->
+    <!--     > -->
+    <!--       Add Plant -->
+    <!--     </button> -->
+    <!--   </div> -->
+    <!-- </div> -->
+    <br />
+    <div class="flex relative justify-center items-end">
+      <ButtonSystemConfig />
+      <ButtonLogout />
+    </div>
+
+    <br />
+
+    <div class="h-[70%] flex flex-col items-end justify-end">
+      <div class="relative bottom-10 right-2">
+        <!-- Svg icon config -->
+        <!-- <ButtonTestSensor /> -->
+      </div>
+    </div>
+  </div>
+</div>
+<style>
+  /* Custom styles for sidebar */
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+  }
+
+  .sidebar-open {
+    transform: translateX(0);
+  }
+
+  .no-select {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+  }
+</style>
+<script is:inline>
+  let sidebarIsOpen = false;
+  const menuButton = document.getElementById("menu-button");
+  const sidebar = document.getElementById("sidebar");
+
+  menuButton.addEventListener("click", () => {
+    setTimeout(() => {
+      sidebarIsOpen = !sidebarIsOpen;
+    }, 50);
+    sidebar.classList.toggle("sidebar-open");
+  });
+</script>

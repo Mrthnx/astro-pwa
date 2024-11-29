@@ -110,6 +110,7 @@
   }
 
   function validateSystemConfig() {
+    console.log("validateSystemConfig");
     let configStore = getSystemConfigStore();
     if (!configStore) {
       saveSystemConfigDefault();

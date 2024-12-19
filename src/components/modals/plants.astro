@@ -132,15 +132,15 @@
             );
             return plant;
           })
-          .then(async (plant) => {
-            for (let area of plant.areas) {
-              for (let system of area.systems) {
-                for (let mawoi of system.mawois) {
-                  await downloadAndSaveImages(mawoi.id, mawoi.images);
-                }
-              }
-            }
-          })
+          // .then(async (plant) => {
+          //   for (let area of plant.areas) {
+          //     for (let system of area.systems) {
+          //       for (let mawoi of system.mawois) {
+          //         await downloadAndSaveImages(mawoi.id, mawoi.images);
+          //       }
+          //     }
+          //   }
+          // })
           .finally(() => {
             const plantsStore = localStorage.getItem("plants") || "[]";
             createHierarchyList(JSON.parse(plantsStore));

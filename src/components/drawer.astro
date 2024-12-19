@@ -192,7 +192,7 @@ import ButtonViewPhotos from "./buttons/buttonViewPhotos.astro";
       if (idx < 0) {
         acc.push({
           id: mawoi.id,
-          code: mawoi.description,
+          code: mawoi.code + " " + mawoi.description,
         });
       }
       return acc;

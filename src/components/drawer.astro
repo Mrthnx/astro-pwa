@@ -243,16 +243,16 @@ import ButtonViewPhotos from "./buttons/buttonViewPhotos.astro";
         varRev: revolution,
         varSamples: samples,
       } = pointOfPlant.point;
-      localStorage.setItem(
-        "setVariables",
-        JSON.stringify({
-          rpm,
-          fmax,
-          lines,
-          revolution,
-          samples,
-        }),
-      );
+      // localStorage.setItem(
+      //   "setVariables",
+      //   JSON.stringify({
+      //     rpm,
+      //     fmax,
+      //     lines,
+      //     revolution,
+      //     samples,
+      //   }),
+      // );
     }
 
     drawByPointId(pointIdDefault);

@@ -147,6 +147,16 @@ import IconVariables from "../components/icons/config.astro";
       return;
     }
 
+    console.log(pointSelect.value);
+
+    savePlantLastUpdatePoint(pointSelect.value, {
+      rpm,
+      fmax,
+      lines,
+      revolution,
+      samples,
+    });
+
     localStorage.setItem(
       "setVariables",
       JSON.stringify({ rpm, fmax, lines, revolution, samples }),
@@ -218,6 +228,13 @@ import IconVariables from "../components/icons/config.astro";
     } else {
       // Restablecer posición si no se sale
       popover.style.left = "";
+    }
+  }
+  function closeCustomPopover() {
+    const popover = document.getElementById("popover");
+    adjustPopoverPosition();
+    if (popover.classList.contains("visible")) {
+      popover.classList.remove("visible");
     }
   }
   function toggleCustomPopover() {

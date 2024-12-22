@@ -237,22 +237,22 @@ import ButtonViewPhotos from "./buttons/buttonViewPhotos.astro";
     const pointOfPlant = findPointForCollectData(pointIdDefault);
     if (pointOfPlant && pointOfPlant.point) {
       const {
-        varRpm: rpm,
+        rpm,
         varFmax: fmax,
         varLines: lines,
         varRev: revolution,
         varSamples: samples,
       } = pointOfPlant.point;
-      // localStorage.setItem(
-      //   "setVariables",
-      //   JSON.stringify({
-      //     rpm,
-      //     fmax,
-      //     lines,
-      //     revolution,
-      //     samples,
-      //   }),
-      // );
+      localStorage.setItem(
+        "setVariables",
+        JSON.stringify({
+          rpm,
+          fmax,
+          lines,
+          revolution,
+          samples,
+        }),
+      );
     }
 
     drawByPointId(pointIdDefault);
@@ -260,6 +260,7 @@ import ButtonViewPhotos from "./buttons/buttonViewPhotos.astro";
   }
 
   function handleChangePoint() {
+    closeCustomPopover();
     if (timeOutChangeMawoiOrPoint) {
       clearTimeout(timeOutChangeMawoiOrPoint);
     }
@@ -267,7 +268,7 @@ import ButtonViewPhotos from "./buttons/buttonViewPhotos.astro";
     const pointOfPlant = findPointForCollectData(pointId);
     if (pointOfPlant && pointOfPlant.point) {
       const {
-        varRpm: rpm,
+        rpm,
         varFmax: fmax,
         varLines: lines,
         varRev: revolution,
@@ -289,6 +290,7 @@ import ButtonViewPhotos from "./buttons/buttonViewPhotos.astro";
   }
 
   function handleChangeMawoi() {
+    closeCustomPopover();
     if (timeOutChangeMawoiOrPoint) {
       clearTimeout(timeOutChangeMawoiOrPoint);
     }
@@ -301,6 +303,7 @@ import ButtonViewPhotos from "./buttons/buttonViewPhotos.astro";
   }
 
   function handleChangeDate() {
+    closeCustomPopover();
     if (timeOutChangeMawoiOrPoint) {
       clearTimeout(timeOutChangeMawoiOrPoint);
     }

@@ -146,6 +146,36 @@ import ButtonSystemConfig from "./buttons/buttonSystemConfig.astro";
     return null;
   }
 
+  function savePlantLastUpdatePoint(pointId, vars) {
+    let plantsStore = localStorage.getItem("plants") || "[]";
+    plantsStore = JSON.parse(plantsStore);
+    plantsStore = plantsStore.map((plant) => {
+      plant.areas.map((area) => {
+        area.systems.map((system) => {
+          system.mawois.map((mawoi) => {
+            mawoi.points.map((point) => {
+              if (point.id == pointId) {
+                console.log(point);
+                point.rpm = vars.rpm;
+                point.varRpm = vars.rpm;
+                point.varFmax = vars.fmax;
+                point.varLines = vars.lines;
+                point.varRev = vars.revolution;
+                point.varSamples = vars.samples;
+              }
+              return point;
+            });
+            return mawoi;
+          });
+          return system;
+        });
+        return area;
+      });
+      return plant;
+    });
+    localStorage.setItem("plants", JSON.stringify(plantsStore));
+  }
+
   function findPointForCollectData(id) {
     let plantsStore = localStorage.getItem("plants") || "[]";
     plantsStore = JSON.parse(plantsStore);

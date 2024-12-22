@@ -37,6 +37,7 @@
     $btnCloseModalSync = document.getElementById("close-modal-sync");
     const btnGetVariables = document.getElementById("btn-sync-survey");
     let surveys = [];
+    let plantSyncId = null;
 
     function hideModalSync() {
       modalIsOpenSync = false;
@@ -45,6 +46,7 @@
     }
 
     function showModalSync(plantId) {
+      plantSyncId = plantId;
       setTimeout(() => {
         modalIsOpenSync = true;
       }, 100);
@@ -252,10 +254,13 @@
               window.location.href = "/";
               return;
             }
-            // mawoisWith = mawoisWith.filter(
-            //   (mawoi) => mawoi.id != data.mawoi.id,
-            // );
-            localStorage.setItem("mawoisWithCollectData", JSON.stringify([]));
+            mawoisWith = mawoisWith.filter(
+              (mawoi) => mawoi.plantId != +plantSyncId,
+            );
+            localStorage.setItem(
+              "mawoisWithCollectData",
+              JSON.stringify(mawoisWith),
+            );
           })
           .catch((error) => {
             console.error("Error:", error);

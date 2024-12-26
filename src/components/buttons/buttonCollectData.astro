@@ -342,9 +342,6 @@
         updateMessage("Next point ...");
         handleChangePoint();
         hideLoading();
-        setTimeout(() => {
-          startCollectData();
-        }, 1000);
       }, valueAwaitTime * 1000);
     } else if (nextMawoi && checkedAwaitTime) {
       timeOutChangeMawoiOrPoint = setTimeout(async () => {
@@ -354,9 +351,6 @@
         updateMessage("Next mawoi...");
         await handleChangeMawoi();
         hideLoading();
-        setTimeout(() => {
-          startCollectData();
-        }, 1000);
       }, valueAwaitTime * 1000);
     }
   }

@@ -174,7 +174,7 @@ import ButtonViewPhotos from "./buttons/buttonViewPhotos.astro";
     drawSimpleClear("NEXT_Z_S");
   }
 
-  function setInformationMawoi(
+  async function setInformationMawoi(
     { code, description, id, points },
     system,
     plant,
@@ -186,13 +186,15 @@ import ButtonViewPhotos from "./buttons/buttonViewPhotos.astro";
       plantId: plant.id,
       points,
     };
+
+    // Actualizar opciones de MAWOI
     mawoiSelect.innerHTML = "";
     const mawoisCode = system.mawois.reduce((acc, mawoi) => {
       const idx = acc.findIndex((p) => p.id === mawoi.id);
       if (idx < 0) {
         acc.push({
           id: mawoi.id,
-          code: mawoi.code + " " + mawoi.description,
+          code: `${mawoi.code} ${mawoi.description}`,
         });
       }
       return acc;
@@ -205,9 +207,10 @@ import ButtonViewPhotos from "./buttons/buttonViewPhotos.astro";
       mawoiSelect.appendChild(option);
     });
 
+    // Actualizar opciones de puntos
     pointSelect.innerHTML = "";
     const pointsCode = points.reduce((acc, point) => {
-      const codePoint = point.code.split("").slice(0, 2).join("");
+      const codePoint = point.code.slice(0, 2); // Simplificado para obtener los primeros 2 caracteres
       const idx = acc.findIndex((p) => p.code === codePoint);
       if (idx < 0) {
         acc.push({
@@ -217,12 +220,11 @@ import ButtonViewPhotos from "./buttons/buttonViewPhotos.astro";
       }
       return acc;
     }, []);
-    pointsCode.forEach((point) => {
-      const pointStore = findPointInCollectData(point.id);
-      let existPointStore = false;
-      if (pointStore && pointStore.point) {
-        existPointStore = true;
-      }
+
+    for (const point of pointsCode) {
+      const pointStore = await findPointInCollectData(point.id); // Esperar la resolución de la consulta
+      const existPointStore = pointStore?.point ? true : false;
+
       const option = document.createElement("option");
       option.value = point.id;
       option.text = point.code;
@@ -230,12 +232,14 @@ import ButtonViewPhotos from "./buttons/buttonViewPhotos.astro";
         option.selected = true;
       }
       pointSelect.appendChild(option);
-    });
+    }
 
+    // Obtener el punto seleccionado por defecto
     const pointIdDefault = pointSelect.value;
 
+    // Obtener información del punto y almacenarla en localStorage
     const pointOfPlant = findPointForCollectData(pointIdDefault);
-    if (pointOfPlant && pointOfPlant.point) {
+    if (pointOfPlant?.point) {
       const {
         rpm,
         varFmax: fmax,
@@ -255,8 +259,11 @@ import ButtonViewPhotos from "./buttons/buttonViewPhotos.astro";
       );
     }
 
-    drawByPointId(pointIdDefault);
-    setDateByMawoiId(id, pointIdDefault);
+    // Dibujar en base al punto seleccionado
+    await drawByPointId(pointIdDefault);
+
+    // Establecer la fecha usando el MAWOI ID y el punto seleccionado
+    await setDateByMawoiId(id, pointIdDefault);
   }
 
   function handleChangePoint() {
@@ -289,7 +296,7 @@ import ButtonViewPhotos from "./buttons/buttonViewPhotos.astro";
     setDateByMawoiId(MAWOI_SELECTED.id, pointId);
   }
 
-  function handleChangeMawoi() {
+  async function handleChangeMawoi() {
     closeCustomPopover();
     if (timeOutChangeMawoiOrPoint) {
       clearTimeout(timeOutChangeMawoiOrPoint);
@@ -299,7 +306,11 @@ import ButtonViewPhotos from "./buttons/buttonViewPhotos.astro";
     const mawoiFind = findMawoiForCollectData(mawoiId);
     localStorage.setItem("mawoiSelected", JSON.stringify(mawoiFind.mawoi));
 
-    setInformationMawoi(mawoiFind.mawoi, mawoiFind.system, mawoiFind.plant);
+    await setInformationMawoi(
+      mawoiFind.mawoi,
+      mawoiFind.system,
+      mawoiFind.plant,
+    );
   }
 
   function handleChangeDate() {
@@ -311,9 +322,8 @@ import ButtonViewPhotos from "./buttons/buttonViewPhotos.astro";
     drawByPointId(pointSelect.value, date);
   }
 
-  function findPointInCollectData(pointId) {
-    let mawoisWithData = localStorage.getItem("mawoisWithCollectData") || "[]";
-    mawoisWithData = JSON.parse(mawoisWithData);
+  async function findPointInCollectData(pointId) {
+    let mawoisWithData = await getMawoisWithCollectDataStore();
     for (let mawoi of mawoisWithData) {
       // order points by date desc
       const points = mawoi.points.sort((a, b) => b.date - a.date);
@@ -326,11 +336,10 @@ import ButtonViewPhotos from "./buttons/buttonViewPhotos.astro";
     return null;
   }
 
-  function setDateByMawoiId(id, pointIdDefault) {
+  async function setDateByMawoiId(id, pointIdDefault) {
     const dateCollect = document.getElementById("date-collect");
     dateCollect.innerHTML = "";
-    let mawoisWithData = localStorage.getItem("mawoisWithCollectData") || "[]";
-    mawoisWithData = JSON.parse(mawoisWithData);
+    let mawoisWithData = await getMawoisWithCollectDataStore();
     const mawoiStore = mawoisWithData.find((mawoi) => mawoi.id == id);
     if (mawoiStore) {
       const dates = mawoiStore.points
@@ -359,9 +368,8 @@ import ButtonViewPhotos from "./buttons/buttonViewPhotos.astro";
     }
   }
 
-  function drawByPointId(pointId, date) {
-    let mawoisStore = localStorage.getItem("mawoisWithCollectData") || "[]";
-    mawoisStore = JSON.parse(mawoisStore);
+  async function drawByPointId(pointId, date) {
+    let mawoisStore = await getMawoisWithCollectDataStore();
     if (mawoisStore && mawoisStore.length > 0) {
       const mawoiStore = mawoisStore.find(
         (mawoi) => mawoi.id == MAWOI_SELECTED.id,
@@ -401,7 +409,7 @@ import ButtonViewPhotos from "./buttons/buttonViewPhotos.astro";
     }
   }
 
-  function drawIfExists() {
+  async function drawIfExists() {
     let mawoiSelectedStore = localStorage.getItem("mawoiSelected") || null;
     if (mawoiSelectedStore) {
       mawoiSelectedStore = JSON.parse(mawoiSelectedStore);
@@ -409,7 +417,7 @@ import ButtonViewPhotos from "./buttons/buttonViewPhotos.astro";
         MAWOI_SELECTED = mawoiSelectedStore;
         const hierarchy = findMawoiForCollectData(MAWOI_SELECTED.id);
         if (hierarchy && hierarchy.system) {
-          setInformationMawoi(
+          await setInformationMawoi(
             MAWOI_SELECTED,
             hierarchy.system,
             hierarchy.plant,

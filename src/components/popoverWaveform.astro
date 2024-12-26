@@ -119,9 +119,9 @@ const { chartName } = Astro.props;
     charts_y = [];
   }
 
-  function convertWaveformDraws(chartName) {
+  async function convertWaveformDraws(chartName) {
     showLoading();
-    let mawoisStore = getMawoisWithCollectDataStore();
+    let mawoisStore = await getMawoisWithCollectDataStore();
     if (mawoisStore.length == 0) {
       hideLoading();
       alert("Please draw the mawoi");

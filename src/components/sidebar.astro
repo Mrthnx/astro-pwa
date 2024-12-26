@@ -302,10 +302,8 @@ import ButtonSystemConfig from "./buttons/buttonSystemConfig.astro";
     }
   }
 
-  function existMawoiInMemory(mawoiId) {
-    let mawoiSelectedStore =
-      localStorage.getItem("mawoisWithCollectData") || "[]";
-    mawoiSelectedStore = JSON.parse(mawoiSelectedStore);
+  async function existMawoiInMemory(mawoiId) {
+    let mawoiSelectedStore = await getMawoisWithCollectDataStore();
     if (mawoiSelectedStore && mawoiSelectedStore.length > 0) {
       const mawoiSelect = mawoiSelectedStore.find(
         (mawoi) => mawoi.id == mawoiId,
@@ -325,10 +323,10 @@ import ButtonSystemConfig from "./buttons/buttonSystemConfig.astro";
   }
 
   // Función para cargar los datos de los menús
-  function createHierarchyList(plants) {
+  async function createHierarchyList(plants) {
     const container = document.getElementById("plants-container");
     container.innerHTML = "";
-    plants.filter(Boolean).forEach((plant) => {
+    for (const plant of plants.filter(Boolean)) {
       const plantButton = document.createElement("button");
       plantButton.className =
         "w-full text-left py-2 px-1 focus:outline-none text-blue-800 text-xs hover:bg-yellow-500 no-select";
@@ -348,12 +346,12 @@ import ButtonSystemConfig from "./buttons/buttonSystemConfig.astro";
       areaList.id = "mplant-" + plant.id;
       areaList.className = "hidden"; // Oculto inicialmente
 
-      plant.areas.forEach((area) => {
+      for (const area of plant.areas) {
         const areaLi = document.createElement("li");
 
         const areaButton = document.createElement("button");
         areaButton.className =
-          "w-full text-left p-1 pl-2  focus:outline-none text-xs hover:bg-yellow-500";
+          "w-full text-left p-1 pl-2 focus:outline-none text-xs hover:bg-yellow-500";
         areaButton.dataset.name = "marea-" + area.id;
         areaButton.textContent = area.description;
 
@@ -370,7 +368,7 @@ import ButtonSystemConfig from "./buttons/buttonSystemConfig.astro";
         systemList.id = "marea-" + area.id;
         systemList.className = "hidden"; // Oculto inicialmente
 
-        area.systems.forEach((system) => {
+        for (const system of area.systems) {
           const systemLi = document.createElement("li");
 
           const systemButton = document.createElement("button");
@@ -392,13 +390,14 @@ import ButtonSystemConfig from "./buttons/buttonSystemConfig.astro";
           mawoiList.id = "msystem-" + system.id;
           mawoiList.className = "hidden"; // Oculto inicialmente
 
-          system.mawois
-            .map((mawoi) => {
-              return {
-                ...mawoi,
-                status: existMawoiInMemory(mawoi.id),
-              };
-            })
+          const mawoisWithStatus = await Promise.all(
+            system.mawois.map(async (mawoi) => ({
+              ...mawoi,
+              status: await existMawoiInMemory(mawoi.id),
+            })),
+          );
+
+          mawoisWithStatus
             .sort((a, b) => a.status - b.status)
             .forEach((mawoi) => {
               const mawoiLi = document.createElement("li");
@@ -419,15 +418,14 @@ import ButtonSystemConfig from "./buttons/buttonSystemConfig.astro";
 
               // Crear el status
               const mawoiStatus = document.createElement("img");
-              const status = existMawoiInMemory(mawoi.id);
               mawoiStatus.src =
-                status == 0
+                mawoi.status == 0
                   ? "/icons/uncheck.svg"
-                  : status == 2
+                  : mawoi.status == 2
                     ? "/icons/check-completed.svg"
                     : "/icons/check-single.svg"; // Ruta de la imagen
               mawoiStatus.alt = "icons status mawoi"; // Texto alternativo
-              mawoiStatus.className = "w-[20px]  p-1 inline-block"; // Estilo de la imagen
+              mawoiStatus.className = "w-[20px] p-1 inline-block"; // Estilo de la imagen
 
               mawoiButton.append(mawoiStatus);
 
@@ -438,12 +436,12 @@ import ButtonSystemConfig from "./buttons/buttonSystemConfig.astro";
           systemLi.appendChild(systemButton);
           systemLi.appendChild(mawoiList);
           systemList.appendChild(systemLi);
-        });
+        }
 
         areaLi.appendChild(areaButton);
         areaLi.appendChild(systemList);
         areaList.appendChild(areaLi);
-      });
+      }
 
       const plantLi = document.createElement("li");
 
@@ -462,7 +460,7 @@ import ButtonSystemConfig from "./buttons/buttonSystemConfig.astro";
       plantLi.appendChild(plantDiv);
       plantLi.appendChild(areaList);
       container.appendChild(plantLi);
-    });
+    }
 
     forEachButtonSidebar();
   }

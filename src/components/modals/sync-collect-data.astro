@@ -54,12 +54,11 @@
       getCollectDataForPlantId(plantId);
     }
 
-    function getCollectDataForPlantId(plantId) {
+    async function getCollectDataForPlantId(plantId) {
       const containerData = document.getElementById("container-data");
       containerData.innerHTML = "";
 
-      let collectStore = localStorage.getItem("mawoisWithCollectData") || "[]";
-      collectStore = JSON.parse(collectStore);
+      let collectStore = await getMawoisWithCollectDataStore();
       if (collectStore && collectStore.length > 0) {
         collectStore = collectStore.filter(
           (collect) => collect.plantId == plantId,
@@ -218,10 +217,9 @@
       });
     }
 
-    function syncSurveyInCloud() {
+    async function syncSurveyInCloud() {
       const token = localStorage.getItem("_token_") || "";
-      let mawoisWith = localStorage.getItem("mawoisWithCollectData") || "[]";
-      mawoisWith = JSON.parse(mawoisWith);
+      let mawoisWith = await getMawoisWithCollectDataStore();
       if (!surveys || surveys.length == 0) {
         alert("No mawois with collect data");
         return;
@@ -257,10 +255,7 @@
             mawoisWith = mawoisWith.filter(
               (mawoi) => mawoi.plantId != +plantSyncId,
             );
-            localStorage.setItem(
-              "mawoisWithCollectData",
-              JSON.stringify(mawoisWith),
-            );
+            saveMawoisWithCollectDataStore(mawoisWith);
           })
           .catch((error) => {
             console.error("Error:", error);

@@ -27,7 +27,7 @@
   </button>
 </div>
 <script is:inline>
-  function removeCollect() {
+  async function removeCollect() {
     const mawoiSelect = document.getElementById("mawoi-select").value;
     const pointSelect = document.getElementById("point-select").value;
     const dateCollect = document.getElementById("date-collect").value;
@@ -53,9 +53,7 @@
 
     if (deleteConfirm) {
       // search mawoi with point and date in mawoisWithCollectData, if found, remove it
-      const dataColllect = JSON.parse(
-        localStorage.getItem("mawoisWithCollectData") || "[]",
-      );
+      const dataColllect = await getMawoisWithCollectDataStore();
       const mawoiIndex = dataColllect.findIndex(
         (mawoi) => mawoi.id == mawoiSelect,
       );
@@ -65,10 +63,7 @@
         );
         if (pointIndex >= 0) {
           dataColllect[mawoiIndex].points.splice(pointIndex, 1);
-          localStorage.setItem(
-            "mawoisWithCollectData",
-            JSON.stringify(dataColllect),
-          );
+          await saveMawoisWithCollectDataStore(dataColllect);
           window.location.reload();
         }
       }

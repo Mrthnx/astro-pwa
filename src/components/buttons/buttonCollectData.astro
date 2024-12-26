@@ -4,23 +4,8 @@
     onclick="startCollectData()"
     id="collectData">Collect Data</button
   >
-  <!-- <button -->
-  <!--   class="w-full rounded-md rounded-green-700 hover:bg-green-800 hover:text-white text-lg text-green-900 border-green-700 border-2 px-2 py-1" -->
-  <!--   onclick="setDataJS()" -->
-  <!-- > -->
-  <!--   TEST -->
-  <!-- </button> -->
 </div>
 <script is:inline>
-  function setDataJS() {
-    const surveys = getMawoisWithCollectDataStore();
-
-    surveys[0].points[0].NEXT_X_S = M_NEXT_X_S.map((coord) => +coord.y);
-    surveys[0].points[0].NEXT_X_W = M_NEXT_X_W.map((coord) => +coord.y);
-
-    saveMawoisWithCollectDataStore(surveys);
-  }
-
   let timeOutChangeMawoiOrPoint = null;
 
   if (timeOutChangeMawoiOrPoint) {
@@ -47,7 +32,7 @@
   };
   var eventActive = "NEXT_X";
 
-  function startCollectData() {
+  async function startCollectData() {
     clearTimeout(timeOutChangeMawoiOrPoint);
 
     if (!toggle.checked) {
@@ -55,12 +40,12 @@
       return;
     }
 
-    const pointInStore = findPointInCollectData(pointSelect.value);
+    const pointInStore = await findPointInCollectData(pointSelect.value);
     if (pointInStore) {
       setBandsInformation(pointInStore.point);
     }
 
-    mawoisWithCollectData = getMawoisWithCollectDataStore();
+    mawoisWithCollectData = await getMawoisWithCollectDataStore();
 
     let setVariables = getVariablesStore();
     if (!setVariables) {
@@ -264,9 +249,9 @@
     validateIfAllPointsAreCollected();
   }
 
-  function nextPointToCollect() {
+  async function nextPointToCollect() {
     const _mawoiSelect = getMawoiSelectedStore();
-    const _mawoisWithCollectData = getMawoisWithCollectDataStore();
+    const _mawoisWithCollectData = await getMawoisWithCollectDataStore();
     let pointsValidate = [];
     let idx = -1;
     if (_mawoisWithCollectData && _mawoisWithCollectData.length > 0) {
@@ -296,22 +281,38 @@
     return nextPoint;
   }
 
-  function nextMawoiToCollect() {
-    const _mawoisWithCollectData = getMawoisWithCollectDataStore();
-    let mawoisValidate = _mawoisWithCollectData.map((mawoi) => mawoi.id);
-    const plantMemory = getPlantsStore();
-    let mawoiUnique = [];
-    for (let plant of plantMemory) {
+  function findPlantNowByMawoiId() {
+    const plantsStore = getPlantsStore();
+    const mawoiSelectedStore = getMawoiSelectedStore();
+    for (let plant of plantsStore) {
       for (let area of plant.areas) {
         for (let system of area.systems) {
           for (let mawoi of system.mawois) {
-            if (!mawoisValidate.includes(mawoi.id)) {
-              mawoiUnique.push(mawoi.id);
+            if (mawoi.id == mawoiSelectedStore.id) {
+              return plant;
             }
           }
         }
       }
     }
+    return null;
+  }
+
+  async function nextMawoiToCollect() {
+    const _mawoisWithCollectData = await getMawoisWithCollectDataStore();
+    let mawoisValidate = _mawoisWithCollectData.map((mawoi) => mawoi.id);
+    const plant = findPlantNowByMawoiId();
+    let mawoiUnique = [];
+    for (let area of plant.areas) {
+      for (let system of area.systems) {
+        for (let mawoi of system.mawois) {
+          if (!mawoisValidate.includes(mawoi.id)) {
+            mawoiUnique.push(mawoi.id);
+          }
+        }
+      }
+    }
+
     mawoisValidate = [...new Set(mawoisValidate)];
 
     let nextMawoi = null;
@@ -326,29 +327,36 @@
 
   // validate if all points are collected
   // when all points are collected, next mawoi empty
-  function validateIfAllPointsAreCollected() {
+  async function validateIfAllPointsAreCollected() {
     const awaitTimeStorage = getAwaitTimeStore();
     const valueAwaitTime = awaitTimeStorage.value;
     const checkedAwaitTime = awaitTimeStorage.checked;
 
-    const nextPoint = nextPointToCollect();
-    const nextMawoi = nextMawoiToCollect();
+    const nextPoint = await nextPointToCollect();
+    const nextMawoi = await nextMawoiToCollect();
 
     if (nextPoint && nextPoint.id && checkedAwaitTime) {
-      pointSelect.value = nextPoint.id;
       timeOutChangeMawoiOrPoint = setTimeout(() => {
+        pointSelect.value = nextPoint.id;
         showLoading();
         updateMessage("Next point ...");
         handleChangePoint();
         hideLoading();
+        setTimeout(() => {
+          startCollectData();
+        }, 1000);
       }, valueAwaitTime * 1000);
     } else if (nextMawoi && checkedAwaitTime) {
-      mawoiSelect.value = nextMawoi;
-      timeOutChangeMawoiOrPoint = setTimeout(() => {
+      timeOutChangeMawoiOrPoint = setTimeout(async () => {
+        mawoiSelect.value = nextMawoi;
+        console.log("Next mawoi...", nextMawoi);
         showLoading();
         updateMessage("Next mawoi...");
-        handleChangeMawoi();
+        await handleChangeMawoi();
         hideLoading();
+        setTimeout(() => {
+          startCollectData();
+        }, 1000);
       }, valueAwaitTime * 1000);
     }
   }

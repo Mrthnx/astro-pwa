@@ -159,8 +159,8 @@ const { chartName } = Astro.props;
     charts_y = [];
   }
 
-  function getPointStore() {
-    let mawoisStore = getMawoisWithCollectDataStore();
+  async function getPointStore() {
+    let mawoisStore = await getMawoisWithCollectDataStore();
     if (mawoisStore.length == 0) {
       hideLoading();
       alert("Please draw the mawoi");
@@ -192,7 +192,7 @@ const { chartName } = Astro.props;
     return pointStore;
   }
 
-  function calculateSpectrumFixed(chartName) {
+  async function calculateSpectrumFixed(chartName) {
     const inputCalculate = document.getElementById("input-calculate");
     const valueCalculate = inputCalculate.value;
     if (valueCalculate) {
@@ -204,7 +204,7 @@ const { chartName } = Astro.props;
         return;
       }
 
-      let pointStore = getPointStore();
+      let pointStore = await getPointStore();
 
       pointStore[chartName] = processSpectra(
         pointStore[chartName],
@@ -223,10 +223,10 @@ const { chartName } = Astro.props;
     }
   }
 
-  function convertSpectrumDraws(chartName) {
+  async function convertSpectrumDraws(chartName) {
     showLoading();
 
-    let pointStore = getPointStore();
+    let pointStore = await getPointStore();
 
     if (!CHARTS[chartName]) {
       hideLoading();

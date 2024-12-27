@@ -7,6 +7,7 @@ import ModalPlants from "../components/modals/plants.astro";
 import ModalPictures from "../components/modals/pictures-mawoi.astro";
 import ModalSyncCollect from "../components/modals/sync-collect-data.astro";
 import ModalSystemConfig from "../components/modals/system-config.astro";
+import AlertError from "../components/alerts/alert-error.astro";
 ---
 
 <Layout title="Dashboard">
@@ -15,6 +16,7 @@ import ModalSystemConfig from "../components/modals/system-config.astro";
   >
     <Sidebar />
     <div class="w-full">
+      <AlertError />
       <Bluetooth />
       <ModalPlants />
       <ModalPictures />

@@ -79,6 +79,7 @@
         let { mawoi: mawoiMemory } = findMawoiForCollectData(mawoi.id);
         mawoi.groupedPoints.forEach((points) => {
           let details = {
+            mawoiDescription: mawoi.description,
             mawoiId: mawoi.id,
             date: points[0].date,
             points: points.map((point) => point.description),
@@ -99,20 +100,26 @@
                     p.code == point.description + "Z" ||
                     p.code == point.description + "A",
                 );
-                return [
-                  {
+                let pointsWithVars = [];
+                if (pointX) {
+                  pointsWithVars.push({
                     pointId: pointX.id,
                     ...point.vars,
-                  },
-                  {
+                  });
+                }
+                if (pointY) {
+                  pointsWithVars.push({
                     pointId: pointY.id,
                     ...point.vars,
-                  },
-                  {
+                  });
+                }
+                if (pointZ) {
+                  pointsWithVars.push({
                     pointId: pointZ.id,
                     ...point.vars,
-                  },
-                ];
+                  });
+                }
+                return pointsWithVars;
               })
               .flat(),
             waveform: [],
@@ -124,58 +131,65 @@
                 p.code == point.description + "X" ||
                 p.code == point.description + "H",
             );
-            point["NEXT_X_W"].forEach((value) => {
-              details.waveform.push({
-                pointId: pointX.id,
-                pointCode: pointX.code,
-                measure_y: value,
+            if (pointX) {
+              point["NEXT_X_W"].forEach((value) => {
+                details.waveform.push({
+                  pointId: pointX.id,
+                  pointCode: pointX.code,
+                  measure_y: value,
+                });
               });
-            });
-            point["NEXT_X_S"].forEach((value) => {
-              details.spectrum.push({
-                pointId: pointX.id,
-                pointCode: pointX.code,
-                measure_y: value,
+              point["NEXT_X_S"].forEach((value) => {
+                details.spectrum.push({
+                  pointId: pointX.id,
+                  pointCode: pointX.code,
+                  measure_y: value,
+                });
               });
-            });
+            }
+
             const pointY = mawoiMemory.points.find(
               (p) =>
                 p.code == point.description + "Y" ||
                 p.code == point.description + "V",
             );
-            point["NEXT_Y_W"].forEach((value) => {
-              details.waveform.push({
-                pointId: pointY.id,
-                pointCode: pointY.code,
-                measure_y: value,
+            if (pointY) {
+              point["NEXT_Y_W"].forEach((value) => {
+                details.waveform.push({
+                  pointId: pointY.id,
+                  pointCode: pointY.code,
+                  measure_y: value,
+                });
               });
-            });
-            point["NEXT_Y_S"].forEach((value) => {
-              details.spectrum.push({
-                pointId: pointY.id,
-                pointCode: pointY.code,
-                measure_y: value,
+              point["NEXT_Y_S"].forEach((value) => {
+                details.spectrum.push({
+                  pointId: pointY.id,
+                  pointCode: pointY.code,
+                  measure_y: value,
+                });
               });
-            });
+            }
             const pointZ = mawoiMemory.points.find(
               (p) =>
                 p.code == point.description + "Z" ||
                 p.code == point.description + "A",
             );
-            point["NEXT_Z_W"].forEach((value) => {
-              details.waveform.push({
-                pointId: pointZ.id,
-                pointCode: pointZ.code,
-                measure_y: value,
+            if (pointZ) {
+              point["NEXT_Z_W"].forEach((value) => {
+                details.waveform.push({
+                  pointId: pointZ.id,
+                  pointCode: pointZ.code,
+                  measure_y: value,
+                });
               });
-            });
-            point["NEXT_Z_S"].forEach((value) => {
-              details.spectrum.push({
-                pointId: pointZ.id,
-                pointCode: pointZ.code,
-                measure_y: value,
+              point["NEXT_Z_S"].forEach((value) => {
+                details.spectrum.push({
+                  pointId: pointZ.id,
+                  pointCode: pointZ.code,
+                  measure_y: value,
+                });
               });
-            });
+            }
           });
           surveys.push(details);
         });
@@ -193,8 +207,9 @@
 
         // Crear el elemento para mawoiId
         const mawoiIdDiv = document.createElement("div");
-        mawoiIdDiv.className = "text-lg font-bold text-gray-800";
-        mawoiIdDiv.textContent = `Mawoi ID: ${item.mawoiId}`;
+        mawoiIdDiv.className =
+          "text-lg font-bold text-gray-800 min-w-[300px] max-w-[300px]";
+        mawoiIdDiv.textContent = `Mawoi ${item.mawoiDescription} - ID: ${item.mawoiId}`;
 
         // Crear el elemento para la fecha
         const dateDiv = document.createElement("div");
@@ -218,6 +233,7 @@
     }
 
     async function syncSurveyInCloud() {
+      updateMessage("Syncing surveys...");
       const token = localStorage.getItem("_token_") || "";
       let mawoisWith = await getMawoisWithCollectDataStore();
       if (!surveys || surveys.length == 0) {
@@ -226,44 +242,48 @@
       }
       showLoading();
       updateMessage("Syncing surveys...");
-      for (let survey of surveys) {
-        fetch(URL_BACKEND + "/offline/survey", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + token,
-          },
-          body: JSON.stringify(survey),
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            console.log("data", data);
-            if (data && data.response && data.response.httpCode == 500) {
-              alert("Server error, please try again later");
-              throw new Error("Server error");
-            }
-            showLoading();
-            return data.data;
-          })
-          .then((data) => {
-            if (!data) {
-              alert("Session expired, please login again");
-              localStorage.removeItem("_token_");
-              window.location.href = "/";
-              return;
-            }
-            mawoisWith = mawoisWith.filter(
-              (mawoi) => mawoi.plantId != +plantSyncId,
-            );
-            saveMawoisWithCollectDataStore(mawoisWith);
-          })
-          .catch((error) => {
-            console.error("Error:", error);
-          })
-          .finally(() => {
-            hideLoading();
-            hideModalSync();
+      for (const survey of surveys) {
+        try {
+          showLoading(); // Muestra el indicador de carga
+          updateMessage(`Syncing survey ${survey.mawoiDescription}...`);
+
+          const response = await fetch(URL_BACKEND + "/offline/survey", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(survey),
           });
+
+          const data = await response.json();
+
+          if (data && data.response && data.response.httpCode === 500) {
+            showAlert(`Error with Mawoi ID: ${survey.mawoiId}`);
+            saveErrosMawois(
+              `${survey.mawoiDescription} ${formatDate(new Date(survey.date))}`,
+            );
+            throw new Error("Server error");
+          }
+
+          if (!data.data) {
+            alert("Session expired, please login again");
+            localStorage.removeItem("_token_");
+            window.location.href = "/";
+            return; // Detenemos la ejecución si la sesión expiró
+          }
+
+          // Aquí puedes manejar cualquier lógica adicional si es necesario
+          // mawoisWith = mawoisWith.filter(
+          //   (mawoi) => mawoi.plantId !== +plantSyncId,
+          // );
+          // saveMawoisWithCollectDataStore(mawoisWith);
+        } catch (error) {
+          console.error("Error:", error);
+        } finally {
+          hideLoading(); // Oculta el indicador de carga
+          hideModalSync(); // Oculta el modal de sincronización si es necesario
+        }
       }
     }
 

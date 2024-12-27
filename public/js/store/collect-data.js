@@ -150,3 +150,15 @@ function getPlantsStore() {
 function savePlantsStore(plantsStore) {
   localStorage.setItem("plants", JSON.stringify(plantsStore));
 }
+
+function saveErrosMawois(mawoiId) {
+  let errors = localStorage.getItem("errorsMawois") || "[]";
+  errors = JSON.parse(errors);
+  errors.push(mawoiId);
+  localStorage.setItem("errorsMawois", JSON.stringify(errors));
+}
+
+function getErrorsMawois() {
+  let errors = localStorage.getItem("errorsMawois") || "[]";
+  return JSON.parse(errors);
+}

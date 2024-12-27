@@ -1,0 +1,48 @@
+<div
+  id="alert-container"
+  class="fixed top-4 left-1/2 transform -translate-x-1/2 space-y-4 hidden z-50"
+>
+  <!-- Las alertas dinámicas se agregarán aquí -->
+</div>
+
+<script is:inline>
+  function showAlert(message) {
+    const container = document.getElementById("alert-container");
+    container.classList.remove("hidden"); // Mostrar el contenedor si está oculto
+
+    // Crear la alerta
+    const alert = document.createElement("div");
+    const count = container.children.length;
+    alert.className = `relative bg-red-100 border border-red-400 text-red-700 px-6 py-4 rounded shadow-lg transition transform -translate-x-${count * 2} opacity-0 animate-fade-in`;
+    alert.innerHTML = `
+    <div class="flex items-start">
+      <span class="flex-1">
+        <strong class="font-bold">Error:</strong>
+        <span class="block sm:inline ml-2">${message}</span>
+      </span>
+      <button 
+        class="text-red-500 hover:text-red-700 ml-4"
+        onclick="this.parentElement.parentElement.remove()">
+        &times;
+      </button>
+    </div>
+  `;
+
+    // Agregar la alerta al contenedor
+    container.appendChild(alert);
+
+    // Agregar clase de animación de entrada
+    setTimeout(() => {
+      alert.classList.remove("opacity-0");
+      alert.classList.add("opacity-100");
+    }, 10);
+
+    // Ocultar la alerta después de 5 segundos
+    setTimeout(() => {
+      alert.remove();
+      if (container.children.length === 0) {
+        container.classList.add("hidden"); // Ocultar el contenedor si no quedan alertas
+      }
+    }, 5000);
+  }
+</script>

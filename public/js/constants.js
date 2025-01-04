@@ -4,6 +4,7 @@ const URL_BACKEND = "https://backend.pdmmonitor.com";
 const OPTIONS_DRAW = {
   title: {
     text: "",
+    fontSize: 14,
   },
   tooltip: {
     enabled: true,

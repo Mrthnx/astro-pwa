@@ -191,10 +191,13 @@
         drawAxios(eventActive + "_S"), 100;
         receivingData = false;
 
-        if (eventActive != "NEXT_Z") {
+        const mawoiSelect = getMawoiSelectedStore();
+        const isMonoaxial = mawoiSelect?.isMonoaxial;
+
+        if (eventActive != "NEXT_Z" && !isMonoaxial) {
           // call next function
           eventActive = eventActive.includes("_X") ? "NEXT_Y" : "NEXT_Z";
-          writeOnCharacteristic("NEXT_X");
+          writeOnCharacteristic(eventActive);
         } else {
           // set storage latest collect data
           setLocalStorageLatestCollectData();

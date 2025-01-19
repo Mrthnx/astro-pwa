@@ -360,7 +360,9 @@
     if (!_mawoiSelect) {
       return [];
     }
-    const points = _mawoiSelect.points.map((point) => point.code.substr(0, 2));
+    const points = _mawoiSelect.points.map((point) =>
+      MAWOI_SELECTED.isMonoaxial ? point.code : point.code.substr(0, 2),
+    );
 
     return [...new Set(points)];
   }

@@ -176,13 +176,14 @@ import ButtonViewPhotos from "./buttons/buttonViewPhotos.astro";
   }
 
   async function setInformationMawoi(
-    { code, description, id, points },
+    { code, description, id, points, isMonoaxial },
     system,
     plant,
   ) {
     MAWOI_SELECTED = {
       code,
       description,
+      isMonoaxial,
       id,
       plantId: plant.id,
       points,
@@ -211,7 +212,9 @@ import ButtonViewPhotos from "./buttons/buttonViewPhotos.astro";
     // Actualizar opciones de puntos
     pointSelect.innerHTML = "";
     const pointsCode = points.reduce((acc, point) => {
-      const codePoint = point.code.slice(0, 2); // Simplificado para obtener los primeros 2 caracteres
+      const codePoint = MAWOI_SELECTED.isMonoaxial
+        ? point.code
+        : point.code.slice(0, 2);
       const idx = acc.findIndex((p) => p.code === codePoint);
       if (idx < 0) {
         acc.push({
@@ -387,19 +390,23 @@ import ButtonViewPhotos from "./buttons/buttonViewPhotos.astro";
           drawAxios("NEXT_X_W", pointStore);
           setTimeout(() => {
             drawAxios("NEXT_X_S", pointStore);
-            setTimeout(() => {
-              drawAxios("NEXT_Y_W", pointStore);
+            if (!MAWOI_SELECTED.isMonoaxial) {
               setTimeout(() => {
-                drawAxios("NEXT_Y_S", pointStore);
+                drawAxios("NEXT_Y_W", pointStore);
                 setTimeout(() => {
-                  drawAxios("NEXT_Z_W", pointStore);
+                  drawAxios("NEXT_Y_S", pointStore);
                   setTimeout(() => {
-                    drawAxios("NEXT_Z_S", pointStore);
-                    hideLoading();
-                  }, 500);
-                }, 400);
-              }, 300);
-            }, 200);
+                    drawAxios("NEXT_Z_W", pointStore);
+                    setTimeout(() => {
+                      drawAxios("NEXT_Z_S", pointStore);
+                      hideLoading();
+                    }, 500);
+                  }, 400);
+                }, 300);
+              }, 200);
+            } else {
+              hideLoading();
+            }
           }, 100);
         } else {
           drawClear();

@@ -3,6 +3,7 @@ import SwitchBluetooth from "./switchBluetooth.astro";
 import ButtonCollectData from "./buttons/buttonCollectData.astro";
 import ButtonLogout from "./buttons/buttonLogout.astro";
 import ButtonSystemConfig from "./buttons/buttonSystemConfig.astro";
+const VERSION = "1.2.0";
 ---
 
 <!-- Navbar -->
@@ -25,7 +26,7 @@ import ButtonSystemConfig from "./buttons/buttonSystemConfig.astro";
           d="M4 6h16M4 12h16m-7 6h7"></path>
       </svg>
     </button>
-    <div class="hidden md:block text-2xl">Corel Force</div>
+    <div class="hidden md:block text-2xl">Corel Force {VERSION}</div>
   </div>
 
   <ButtonCollectData />

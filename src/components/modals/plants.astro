@@ -117,7 +117,7 @@
             }
             return data.data;
           })
-          .then((data) => {
+          .then(async (data) => {
             if (!data) {
               alert("Session expired, please login again");
               localStorage.removeItem("_token_");
@@ -130,6 +130,14 @@
               "plants",
               JSON.stringify(plants.filter(Boolean)),
             );
+
+            for (let area of plant.areas) {
+              for (let system of area.systems) {
+                for (let mawoi of system.mawois) {
+                  await downloadAndSaveImages(mawoi.id, mawoi.images);
+                }
+              }
+            }
             return plant;
           })
           .finally(async () => {
@@ -140,15 +148,6 @@
             hideModalPlants();
             hideLoading();
 
-            const plant = plantsStore.at(-1);
-
-            for (let area of plant.areas) {
-              for (let system of area.systems) {
-                for (let mawoi of system.mawois) {
-                  await downloadAndSaveImages(mawoi.id, mawoi.images);
-                }
-              }
-            }
             // window.location.reload();
           });
       }

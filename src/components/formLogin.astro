@@ -1,13 +1,15 @@
 ---
 import IconLogin from "../components/icons/login.astro";
+
+const VERSION = import.meta.env.VERSION;
 ---
 
 <div
-  class="flex flex-col items-center justify-around w-[85vw] sm:w-[75vw] md:w-[50vh] h-[420px] bg-white m-2 p-4 rounded-lg max-w-[305px]"
+  class="flex flex-col items-center justify-around w-[85vw] sm:w-[75vw] md:w-[50vh] h-[480px] bg-white m-2 p-4 rounded-lg max-w-[305px]"
 >
   <div class="flex flex-col justify-center items-center">
     <img src="/corelusa.png" alt="Corelusa logo" class="w-16" />
-    <h1 class="text-blue-900 font-bold text-2xl">Corel Force</h1>
+    <h1 class="text-blue-900 font-bold text-2xl">Corel Force {VERSION}</h1>
   </div>
   <div class="h-[40vh] w-full mb-4 p-2 rounded-lg flex flex-col justify-end">
     <div>
@@ -44,11 +46,49 @@ import IconLogin from "../components/icons/login.astro";
             <IconLogin />
           </div>
         </button>
+
+        <!-- button clear cache -->
+        <!-- <br /> -->
+        <!-- <br /> -->
+        <!-- <button -->
+        <!--   id="button-clear-cache" -->
+        <!--   onclick="clearCache()" -->
+        <!--   class="w-full border-red-800 border-2 text-red-900 font-bold py-1 px-2 rounded-lg hover:bg-red-800 hover:text-white flex items-center justify-center" -->
+        <!-- > -->
+        <!--   Clear Cache -->
+        <!--   <div class="pl-1"> -->
+        <!--     <!-- svg trash --> -->
+        <!--     <svg -->
+        <!--       xmlns="http://www.w3.org/2000/svg" -->
+        <!--       width="24" -->
+        <!--       height="24" -->
+        <!--       viewBox="0 0 24 24" -->
+        <!--       fill="none" -->
+        <!--       stroke="currentColor" -->
+        <!--       stroke-width="2" -->
+        <!--       stroke-linecap="round" -->
+        <!--       stroke-linejoin="round" -->
+        <!--     > -->
+        <!--       <polyline points="3 6 5 6 21 6"></polyline> -->
+        <!--       <path -->
+        <!--         d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" -->
+        <!--       ></path> -->
+        <!--     </svg> -->
+        <!--   </div> -->
+        <!-- </button> -->
       </div>
     </div>
   </div>
 </div>
 <script is:inline>
+  function clearCache() {
+    if (confirm("Are you sure you want to clear the cache?")) {
+      localStorage.clear();
+      clearAllIndexedDB();
+      window.location.reload();
+    }
+  }
+
   const input_password = document.getElementById("input-password");
   input_password.addEventListener("keyup", (event) => {
     if (event.key === "Enter") {

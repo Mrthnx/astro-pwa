@@ -162,3 +162,37 @@ function getErrorsMawois() {
   let errors = localStorage.getItem("errorsMawois") || "[]";
   return JSON.parse(errors);
 }
+
+function clearAllIndexedDB() {
+  if (!window.indexedDB) {
+    console.error("IndexedDB is not supported in this browser.");
+    return;
+  }
+
+  const req = indexedDB.databases();
+  req
+    .then((databases) => {
+      databases.forEach((dbInfo) => {
+        const dbName = dbInfo.name;
+        const deleteRequest = indexedDB.deleteDatabase(dbName);
+
+        deleteRequest.onsuccess = () => {
+          console.log(`Database ${dbName} deleted successfully.`);
+        };
+
+        deleteRequest.onerror = (event) => {
+          console.error(
+            `Error deleting database ${dbName}:`,
+            event.target.error,
+          );
+        };
+
+        deleteRequest.onblocked = () => {
+          console.warn(`Delete operation blocked for database ${dbName}.`);
+        };
+      });
+    })
+    .catch((error) => {
+      console.error("Error listing databases:", error);
+    });
+}

@@ -194,38 +194,38 @@
       date: dateSelect.value,
     };
 
-    saveOrUpdateBandInformationStore({
-      ...bandInfoTemp,
-      ...calculateBandsInformationInCollectData(
-        pointWithCollectData.NEXT_X_W,
-        pointWithCollectData.NEXT_X_S,
-        pointInUse,
-        FMAX,
-        "X",
-      ),
-    });
+    // saveOrUpdateBandInformationStore({
+    //   ...bandInfoTemp,
+    //   ...calculateBandsInformationInCollectData(
+    //     pointWithCollectData.NEXT_X_W,
+    //     pointWithCollectData.NEXT_X_S,
+    //     pointInUse,
+    //     FMAX,
+    //     "X",
+    //   ),
+    // });
+    //
+    // saveOrUpdateBandInformationStore({
+    //   ...bandInfoTemp,
+    //   ...calculateBandsInformationInCollectData(
+    //     pointWithCollectData.NEXT_Y_W,
+    //     pointWithCollectData.NEXT_Y_S,
+    //     pointInUse,
+    //     FMAX,
+    //     "Y",
+    //   ),
+    // });
 
-    saveOrUpdateBandInformationStore({
-      ...bandInfoTemp,
-      ...calculateBandsInformationInCollectData(
-        pointWithCollectData.NEXT_Y_W,
-        pointWithCollectData.NEXT_Y_S,
-        pointInUse,
-        FMAX,
-        "Y",
-      ),
-    });
-
-    saveOrUpdateBandInformationStore({
-      ...bandInfoTemp,
-      ...calculateBandsInformationInCollectData(
-        pointWithCollectData.NEXT_Z_W,
-        pointWithCollectData.NEXT_Z_S,
-        pointInUse,
-        FMAX,
-        "Z",
-      ),
-    });
+    // saveOrUpdateBandInformationStore({
+    //   ...bandInfoTemp,
+    //   ...calculateBandsInformationInCollectData(
+    //     pointWithCollectData.NEXT_Z_W,
+    //     pointWithCollectData.NEXT_Z_S,
+    //     pointInUse,
+    //     FMAX,
+    //     "Z",
+    //   ),
+    // });
   }
 
   function setLocalStorageLatestCollectData() {

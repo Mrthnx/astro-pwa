@@ -177,9 +177,8 @@ function waveformDisplacement(input) {
 }
 
 function processSpectra(arr, fixedMultiplier) {
-  return arr;
-  // fixedMultiplier = fixedMultiplier ?? PARAMS_SPEC.FIXED;
-  // // Aplicar la condición de umbral y multiplicador
+  fixedMultiplier = fixedMultiplier ?? PARAMS_SPEC.FIXED;
+  // Aplicar la condición de umbral y multiplicador
   // arr = arr.map((value) =>
   //   value <= PARAMS_SPEC.THRESHOLD ? value * PARAMS_SPEC.MULTIPLIER : value,
   // );
@@ -205,9 +204,11 @@ function processSpectra(arr, fixedMultiplier) {
   //     (intermediate1[i] * PARAMS_SPEC.C + intermediate2[i]) *
   //     fixedMultiplier,
   // );
-  //
-  // // Convertir el resultado a una cadena separada por comas
-  // return result;
+
+  const result = arr.map((value) => value * fixedMultiplier);
+
+  // Convertir el resultado a una cadena separada por comas
+  return result;
 }
 
 function processBandsInfo(rpm, velocitySpectra, bandParam) {

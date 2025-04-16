@@ -1,7 +1,8 @@
 ---
 import IconLogin from "../components/icons/login.astro";
+import * as packageJson from '../../package.json';
 
-const VERSION = import.meta.env.VERSION;
+const VERSION = packageJson.version;
 ---
 
 <div

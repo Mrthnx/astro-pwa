@@ -177,36 +177,37 @@ function waveformDisplacement(input) {
 }
 
 function processSpectra(arr, fixedMultiplier) {
-  fixedMultiplier = fixedMultiplier ?? PARAMS_SPEC.FIXED;
-  // Aplicar la condición de umbral y multiplicador
-  arr = arr.map((value) =>
-    value <= PARAMS_SPEC.THRESHOLD ? value * PARAMS_SPEC.MULTIPLIER : value,
-  );
-
-  // Crear un índice del 1 al tamaño del array
-  const index = Array.from({ length: arr.length }, (_, i) => i + 1);
-
-  // Calcular intermediate1
-  const intermediate1 = index.map(
-    (i) =>
-      Math.atan(i / (PARAMS_SPEC.A * 100) - PARAMS_SPEC.B) + PARAMS_SPEC.B / 2,
-  );
-
-  // Calcular intermediate2
-  const intermediate2 = index.map((i) =>
-    Math.pow(i / (PARAMS_SPEC.D * 100000), 2),
-  );
-
-  // Calcular el resultado final
-  const result = arr.map(
-    (value, i) =>
-      value *
-      (intermediate1[i] * PARAMS_SPEC.C + intermediate2[i]) *
-      fixedMultiplier,
-  );
-
-  // Convertir el resultado a una cadena separada por comas
-  return result;
+  return arr;
+  // fixedMultiplier = fixedMultiplier ?? PARAMS_SPEC.FIXED;
+  // // Aplicar la condición de umbral y multiplicador
+  // arr = arr.map((value) =>
+  //   value <= PARAMS_SPEC.THRESHOLD ? value * PARAMS_SPEC.MULTIPLIER : value,
+  // );
+  //
+  // // Crear un índice del 1 al tamaño del array
+  // const index = Array.from({ length: arr.length }, (_, i) => i + 1);
+  //
+  // // Calcular intermediate1
+  // const intermediate1 = index.map(
+  //   (i) =>
+  //     Math.atan(i / (PARAMS_SPEC.A * 100) - PARAMS_SPEC.B) + PARAMS_SPEC.B / 2,
+  // );
+  //
+  // // Calcular intermediate2
+  // const intermediate2 = index.map((i) =>
+  //   Math.pow(i / (PARAMS_SPEC.D * 100000), 2),
+  // );
+  //
+  // // Calcular el resultado final
+  // const result = arr.map(
+  //   (value, i) =>
+  //     value *
+  //     (intermediate1[i] * PARAMS_SPEC.C + intermediate2[i]) *
+  //     fixedMultiplier,
+  // );
+  //
+  // // Convertir el resultado a una cadena separada por comas
+  // return result;
 }
 
 function processBandsInfo(rpm, velocitySpectra, bandParam) {

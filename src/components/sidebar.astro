@@ -3,8 +3,9 @@ import SwitchBluetooth from "./switchBluetooth.astro";
 import ButtonCollectData from "./buttons/buttonCollectData.astro";
 import ButtonLogout from "./buttons/buttonLogout.astro";
 import ButtonSystemConfig from "./buttons/buttonSystemConfig.astro";
+import * as packageJson from '../../package.json';
 
-const VERSION = import.meta.env.VERSION;
+const VERSION = packageJson.version;
 ---
 
 <!-- Navbar -->

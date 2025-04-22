@@ -1,5 +1,11 @@
-// Función para abrir la base de datos
+// Instancia global para la base de datos
+let dbInstance = null;
+
+// Función para abrir la base de datos (singleton)
 function openDatabase() {
+  if (dbInstance) {
+    return Promise.resolve(dbInstance);
+  }
   console.log("Opening database...");
   return new Promise((resolve, reject) => {
     const request = indexedDB.open("collectData", 1);
@@ -15,7 +21,8 @@ function openDatabase() {
     };
 
     request.onsuccess = (event) => {
-      resolve(event.target.result);
+      dbInstance = event.target.result;
+      resolve(dbInstance);
     };
 
     request.onerror = (event) => {

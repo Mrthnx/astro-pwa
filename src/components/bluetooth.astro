@@ -1,4 +1,5 @@
 <script is:inline>
+  let dataTimeout = null;
   // DOM Elements
   const bleStateContainer = document.getElementById("bleState");
 
@@ -146,19 +147,20 @@
   }
 
   function handleCharacteristicCommandChange(event) {
-    let message;
     const data = event.target.value;
-
     console.log("Received data: ", data);
   }
 
   function handleCharacteristicChange(event) {
+    clearDataTimeout();
     let message;
+
     const data = event.target.value;
 
     try {
       message = new TextDecoder("utf-8").decode(data);
     } catch (_) {
+      console.log("Error decoding data");
       message = null;
     }
 
@@ -232,6 +234,39 @@
     }
   }
 
+  function startDataTimeout() {
+    if (!dataTimeout) {
+      console.log("Starting data timeout...");
+      dataTimeout = setDataTimeout();
+    }
+  }
+
+  function setDataTimeout() {
+    return setTimeout(() => {
+      console.log("No data received in 2s, moving to next event.");
+      handleNoDataTimeout();
+    }, 5000);
+  }
+
+  function clearDataTimeout() {
+    if (dataTimeout) {
+      console.log("Clearing data timeout");
+      clearTimeout(dataTimeout);
+      dataTimeout = setDataTimeout();
+    }
+  }
+
+  function handleNoDataTimeout() {
+    // Lógica para avanzar al siguiente evento
+    if (eventActive != "NEXT_Z") {
+      eventActive = eventActive.includes("_X") ? "NEXT_Y" : "NEXT_Z";
+      writeOnCharacteristic(eventActive);
+    } else {
+      setLocalStorageLatestCollectData();
+    }
+    hideLoading();
+  }
+
   function writeOnCharacteristic(value) {
     if (bleServer && bleServer.connected) {
       bleServiceFound
@@ -243,11 +278,15 @@
         })
         .then(() => {
           console.log("Value written to characteristic:", value);
+          if (value.includes("NEXT")) {
+            startDataTimeout();
+          }
         })
         .catch((error) => {
           console.error("Error writing to the Data characteristic: ", error);
         });
     } else {
+      hideLoading();
       console.error("Bluetooth is not connected.");
       window.alert("Bluetooth is not connected.");
     }

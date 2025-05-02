@@ -8,14 +8,22 @@ function diffInMinutes(date1, date2) {
 function groupPointsByDate(mawois, rangeInMinutes = 15) {
   const result = [];
 
+  mawois = mawois.filter(
+    (mawoi, index, self) => index === self.findIndex((m) => m.id === mawoi.id),
+  );
+
   mawois.forEach((mawoi) => {
     const groupedPoints = [];
     let currentGroup = [];
 
     // Ordenar los puntos por fecha
-    const sortedPoints = mawoi.points.sort(
-      (a, b) => new Date(a.date) - new Date(b.date),
-    );
+    const sortedPoints = mawoi.points
+      .filter(
+        (point, index, self) =>
+          index ===
+          self.findIndex((p) => p.id === point.id && p.date === point.date),
+      )
+      .sort((a, b) => new Date(a.date) - new Date(b.date));
 
     sortedPoints.forEach((point, index) => {
       if (currentGroup.length === 0) {

@@ -202,6 +202,7 @@
           writeOnCharacteristic(eventActive);
         } else {
           // set storage latest collect data
+          clearTimeout(dataTimeout);
           setLocalStorageLatestCollectData();
         }
       }

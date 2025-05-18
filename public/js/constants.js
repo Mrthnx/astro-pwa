@@ -1,5 +1,11 @@
 const URL_BACKEND = "https://backend.pdmmonitor.com/api";
 // const URL_BACKEND = "http://localhost:3000";
+const ESP32_IP = "http://IP";
+const GET_VARIABLES = "command?cmd=GET_VARIABLES";
+const GET_VOLTAJE = "command?cmd=GET_VOLTAGE";
+const SET_VARIABLES = "command?cmd=SET_VARIABLES";
+const GET_WAVE = "data?eje=EJE&modo=waveform";
+const GET_SPECTRA = "data?eje=EJE&modo=spectrum";
 
 const OPTIONS_DRAW = {
   title: {

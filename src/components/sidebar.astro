@@ -3,7 +3,7 @@ import SwitchBluetooth from "./switchBluetooth.astro";
 import ButtonCollectData from "./buttons/buttonCollectData.astro";
 import ButtonLogout from "./buttons/buttonLogout.astro";
 import ButtonSystemConfig from "./buttons/buttonSystemConfig.astro";
-import * as packageJson from '../../package.json';
+import * as packageJson from "../../package.json";
 
 const VERSION = packageJson.version;
 ---
@@ -28,11 +28,15 @@ const VERSION = packageJson.version;
           d="M4 6h16M4 12h16m-7 6h7"></path>
       </svg>
     </button>
-    <div class="hidden md:block text-2xl">Corel Force {VERSION}</div>
   </div>
 
   <ButtonCollectData />
-  <SwitchBluetooth />
+
+  <div class="hidden md:block text-2xl">
+    Corel Force
+    <span class="text-sm"> {VERSION}</span>
+  </div>
+  <!-- <SwitchBluetooth /> -->
 </nav>
 <div class="flex">
   <!-- Sidebar -->

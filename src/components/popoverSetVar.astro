@@ -16,6 +16,16 @@ import IconVariables from "../components/icons/config.astro";
     class="hidden absolute bg-blue-800 p-4 shadow-lg rounded-lg mt-2 text-sm text-white"
   >
     <div class="block min-w-[200px]">
+      <div class="flex justify-around items-center py-2">
+        <label for="ip" class="px-2">IP</label>
+        <input
+          type="text"
+          id="ip"
+          class="w-full text-blue-900 px-2 rounded-full focus:outline-none focus:ring-0 focus:border-transparent"
+          value="192.168.4.1"
+        />
+      </div>
+      <hr class="py-1" />
       <div class="flex justify-around items-center">
         <label for="rpm" class="px-2">RPM</label>
         <input
@@ -133,6 +143,7 @@ import IconVariables from "../components/icons/config.astro";
   }
 
   function saveVariables() {
+    const ip = document.getElementById("ip").value;
     const rpm = +document.getElementById("rpm").value;
     const fmax = +document.getElementById("fmax").value;
     const lines = +document.getElementById("lines").value;
@@ -147,9 +158,8 @@ import IconVariables from "../components/icons/config.astro";
       return;
     }
 
-    console.log(pointSelect.value);
-
     savePlantLastUpdatePoint(pointSelect.value, {
+      ip,
       rpm,
       fmax,
       lines,
@@ -159,7 +169,7 @@ import IconVariables from "../components/icons/config.astro";
 
     localStorage.setItem(
       "setVariables",
-      JSON.stringify({ rpm, fmax, lines, revolution, samples }),
+      JSON.stringify({ ip, rpm, fmax, lines, revolution, samples }),
     );
 
     localStorage.setItem(
@@ -183,6 +193,7 @@ import IconVariables from "../components/icons/config.astro";
     const awaitTimeStorage = localStorage.getItem("awaitTime");
     if (varStorage) {
       const variables = JSON.parse(varStorage);
+      document.getElementById("ip").value = variables.ip;
       document.getElementById("rpm").value = variables.rpm;
       document.getElementById("fmax").value = variables.fmax;
       document.getElementById("lines").value = variables.lines;
@@ -198,6 +209,7 @@ import IconVariables from "../components/icons/config.astro";
   }
 
   function setVariablesDefault() {
+    const ip = document.getElementById("ip").value;
     const rpm = document.getElementById("rpm").value;
     const fmax = document.getElementById("fmax").value;
     const lines = document.getElementById("lines").value;
@@ -209,7 +221,7 @@ import IconVariables from "../components/icons/config.astro";
 
     localStorage.setItem(
       "setVariables",
-      JSON.stringify({ rpm, fmax, lines, revolution, samples }),
+      JSON.stringify({ ip, rpm, fmax, lines, revolution, samples }),
     );
 
     localStorage.setItem(

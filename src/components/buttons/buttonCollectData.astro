@@ -1,9 +1,31 @@
 <div>
+  <!-- <button -->
+  <!--   class="w-full rounded-md rounded-green-700 hover:bg-green-800 hover:text-white text-lg text-green-900 border-green-700 border-2 px-2 py-1" -->
+  <!--   onclick="startCollectData()" -->
+  <!--   id="collectData">Collect Data</button -->
+  <!-- > -->
   <button
-    class="w-full rounded-md rounded-green-700 hover:bg-green-800 hover:text-white text-lg text-green-900 border-green-700 border-2 px-2 py-1"
-    onclick="startCollectData()"
-    id="collectData">Collect Data</button
+    class="w-full rounded-md rounded-green-700 hover:bg-green-800 hover:text-white text-lg text-green-900 border-green-700 border-2 px-2 py-1 flex items-center justify-center"
+    onclick="startCollectDataWifi()"
+    id="collectData"
   >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      class="inline-block mr-2 align-top"
+      style="margin-top:-8px;"
+      width="30"
+      height="30"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      ><path d="M5 13a10 10 0 0 1 14 0"></path><path d="M8.5 16.5a5 5 0 0 1 7 0"
+      ></path><path d="M12 20h.01"></path></svg
+    >
+    <span> Collect Data </span>
+  </button>
 </div>
 <script is:inline>
   let timeOutChangeMawoiOrPoint = null;
@@ -32,13 +54,8 @@
   };
   var eventActive = "NEXT_X";
 
-  async function startCollectData() {
+  async function startCollectDataWifi() {
     clearTimeout(timeOutChangeMawoiOrPoint);
-
-    if (!toggle.checked) {
-      alert("Please turn on Bluetooth!");
-      return;
-    }
 
     const pointInStore = await findPointInCollectData(pointSelect.value);
     if (pointInStore) {
@@ -53,6 +70,11 @@
       setVariables = getVariablesStore();
     }
 
+    if (!setVariables.ip) {
+      alert("Please save ip value");
+      return;
+    }
+
     if (MAWOI_SELECTED == null) {
       alert("Please select a mawoi!");
       return;
@@ -60,30 +82,89 @@
 
     showLoading();
     updateMessage("Set variables");
-    setTimeout(() => {
-      writeOnCharacteristic("SET_SAMPLES=" + setVariables.samples);
-      setTimeout(() => {
-        writeOnCharacteristic("SET_NLINES=" + setVariables.lines);
-        setTimeout(() => {
-          writeOnCharacteristic("SET_NREVS=" + setVariables.revolution);
-          setTimeout(() => {
-            writeOnCharacteristic("SET_FMAX=" + setVariables.fmax);
-            setTimeout(() => {
-              writeOnCharacteristic("SET_RPM=" + setVariables.rpm);
-              setTimeout(() => {
-                hideLoading();
-                processCollectData();
-              }, 500);
-            }, 500);
-          }, 500);
-        }, 500);
-      }, 500);
-    }, 0);
+    let urlSetVariables = `${ESP32_IP}/${SET_VARIABLES}`;
+    urlSetVariables = urlSetVariables.replace("IP", setVariables.ip);
+    urlSetVariables = urlSetVariables.replace(
+      "SET_VARIABLES",
+      "SET_SAMPLES=" + setVariables.samples,
+    );
+    await fetchData(urlSetVariables);
+    urlSetVariables = urlSetVariables.replace(
+      "SET_VARIABLES",
+      "SET_NLINES=" + setVariables.lines,
+    );
+    await fetchData(urlSetVariables);
+    urlSetVariables = urlSetVariables.replace(
+      "SET_VARIABLES",
+      "SET_NREVS=" + setVariables.revolution,
+    );
+    await fetchData(urlSetVariables);
+    urlSetVariables = urlSetVariables.replace(
+      "SET_VARIABLES",
+      `SET_FMAX=${setVariables.fmax}`,
+    );
+    await fetchData(urlSetVariables);
+    urlSetVariables = urlSetVariables.replace(
+      "SET_VARIABLES",
+      `SET_RPM=${setVariables.rpm}`,
+    );
+    await fetchData(urlSetVariables);
+
+    await processCollectData();
   }
+
+  // async function startCollectData() {
+  //   clearTimeout(timeOutChangeMawoiOrPoint);
+  //
+  //   if (!toggle.checked) {
+  //     alert("Please turn on Bluetooth!");
+  //     return;
+  //   }
+  //
+  //   const pointInStore = await findPointInCollectData(pointSelect.value);
+  //   if (pointInStore) {
+  //     setBandsInformation(pointInStore.point);
+  //   }
+  //
+  //   mawoisWithCollectData = await getMawoisWithCollectDataStore();
+  //
+  //   let setVariables = getVariablesStore();
+  //   if (!setVariables) {
+  //     setVariablesDefault();
+  //     setVariables = getVariablesStore();
+  //   }
+  //
+  //   if (MAWOI_SELECTED == null) {
+  //     alert("Please select a mawoi!");
+  //     return;
+  //   }
+  //
+  //   showLoading();
+  //   updateMessage("Set variables");
+  //   setTimeout(() => {
+  //     writeOnCharacteristic("SET_SAMPLES=" + setVariables.samples);
+  //     setTimeout(() => {
+  //       writeOnCharacteristic("SET_NLINES=" + setVariables.lines);
+  //       setTimeout(() => {
+  //         writeOnCharacteristic("SET_NREVS=" + setVariables.revolution);
+  //         setTimeout(() => {
+  //           writeOnCharacteristic("SET_FMAX=" + setVariables.fmax);
+  //           setTimeout(() => {
+  //             writeOnCharacteristic("SET_RPM=" + setVariables.rpm);
+  //             setTimeout(() => {
+  //               hideLoading();
+  //               processCollectData();
+  //             }, 500);
+  //           }, 500);
+  //         }, 500);
+  //       }, 500);
+  //     }, 500);
+  //   }, 0);
+  // }
 
   let idxMawoi = -1;
 
-  function processCollectData() {
+  async function processCollectData() {
     drawClear();
     showLoading();
     let mawoiStore = getMawoiSelectedStore();
@@ -123,8 +204,33 @@
     }
 
     showLoading();
-    eventActive = "NEXT_X";
-    writeOnCharacteristic("NEXT_X");
+    // eventActive = "NEXT_X";
+    // writeOnCharacteristic("NEXT_X");
+
+    let urlGetWaveform = `${ESP32_IP}/${GET_WAVE}`;
+    let urlGetSpectrum = `${ESP32_IP}/${GET_SPECTRA}`;
+    urlGetWaveform = urlGetWaveform.replace("IP", vars.ip);
+    urlGetSpectrum = urlGetSpectrum.replace("IP", vars.ip);
+    urlGetWaveform = urlGetWaveform.replace("EJE", "x");
+    pointWithCollectData.NEXT_X_W = await fetchData(urlGetWaveform);
+    urlGetSpectrum = urlGetSpectrum.replace("EJE", "x");
+    pointWithCollectData.NEXT_X_S = processSpectra(
+      await fetchData(urlGetSpectrum),
+    );
+    urlGetWaveform = urlGetWaveform.replace("EJE", "y");
+    pointWithCollectData.NEXT_Y_W = await fetchData(urlGetWaveform);
+    urlGetSpectrum = urlGetSpectrum.replace("EJE", "y");
+    pointWithCollectData.NEXT_Y_S = processSpectra(
+      await fetchData(urlGetSpectrum),
+    );
+    urlGetWaveform = urlGetWaveform.replace("EJE", "z");
+    pointWithCollectData.NEXT_Z_W = await fetchData(urlGetWaveform);
+    urlGetSpectrum = urlGetSpectrum.replace("EJE", "z");
+    pointWithCollectData.NEXT_Z_S = processSpectra(
+      await fetchData(urlGetSpectrum),
+    );
+
+    setLocalStorageLatestCollectData();
   }
 
   function saveOrUpdateBandInformationStore(bandInfoTemp) {

@@ -89,21 +89,29 @@
       "SET_SAMPLES=" + setVariables.samples,
     );
     await fetchData(urlSetVariables);
+    urlSetVariables = `${ESP32_IP}/${SET_VARIABLES}`;
+    urlSetVariables = urlSetVariables.replace("IP", setVariables.ip);
     urlSetVariables = urlSetVariables.replace(
       "SET_VARIABLES",
       "SET_NLINES=" + setVariables.lines,
     );
     await fetchData(urlSetVariables);
+    urlSetVariables = `${ESP32_IP}/${SET_VARIABLES}`;
+    urlSetVariables = urlSetVariables.replace("IP", setVariables.ip);
     urlSetVariables = urlSetVariables.replace(
       "SET_VARIABLES",
       "SET_NREVS=" + setVariables.revolution,
     );
     await fetchData(urlSetVariables);
+    urlSetVariables = `${ESP32_IP}/${SET_VARIABLES}`;
+    urlSetVariables = urlSetVariables.replace("IP", setVariables.ip);
     urlSetVariables = urlSetVariables.replace(
       "SET_VARIABLES",
       `SET_FMAX=${setVariables.fmax}`,
     );
     await fetchData(urlSetVariables);
+    urlSetVariables = `${ESP32_IP}/${SET_VARIABLES}`;
+    urlSetVariables = urlSetVariables.replace("IP", setVariables.ip);
     urlSetVariables = urlSetVariables.replace(
       "SET_VARIABLES",
       `SET_RPM=${setVariables.rpm}`,
@@ -212,23 +220,23 @@
     urlGetWaveform = urlGetWaveform.replace("IP", vars.ip);
     urlGetSpectrum = urlGetSpectrum.replace("IP", vars.ip);
     urlGetWaveform = urlGetWaveform.replace("EJE", "x");
-    pointWithCollectData.NEXT_X_W = await fetchData(urlGetWaveform);
+    pointWithCollectData.NEXT_X_W = await fetchData(urlGetWaveform, true);
+    drawAxios("NEXT_X_W");
     urlGetSpectrum = urlGetSpectrum.replace("EJE", "x");
-    pointWithCollectData.NEXT_X_S = processSpectra(
-      await fetchData(urlGetSpectrum),
-    );
-    urlGetWaveform = urlGetWaveform.replace("EJE", "y");
-    pointWithCollectData.NEXT_Y_W = await fetchData(urlGetWaveform);
-    urlGetSpectrum = urlGetSpectrum.replace("EJE", "y");
-    pointWithCollectData.NEXT_Y_S = processSpectra(
-      await fetchData(urlGetSpectrum),
-    );
-    urlGetWaveform = urlGetWaveform.replace("EJE", "z");
-    pointWithCollectData.NEXT_Z_W = await fetchData(urlGetWaveform);
-    urlGetSpectrum = urlGetSpectrum.replace("EJE", "z");
-    pointWithCollectData.NEXT_Z_S = processSpectra(
-      await fetchData(urlGetSpectrum),
-    );
+    pointWithCollectData.NEXT_X_S = await fetchData(urlGetSpectrum, true);
+    drawAxios("NEXT_X_S");
+    urlGetWaveform = urlGetWaveform.replace("=x", "=y");
+    pointWithCollectData.NEXT_Y_W = await fetchData(urlGetWaveform, true);
+    drawAxios("NEXT_Y_W");
+    urlGetSpectrum = urlGetSpectrum.replace("=x", "=y");
+    pointWithCollectData.NEXT_Y_S = await fetchData(urlGetSpectrum, true);
+    drawAxios("NEXT_Y_S");
+    urlGetWaveform = urlGetWaveform.replace("=y", "=z");
+    pointWithCollectData.NEXT_Z_W = await fetchData(urlGetWaveform, true);
+    drawAxios("NEXT_Z_W");
+    urlGetSpectrum = urlGetSpectrum.replace("=y", "=z");
+    pointWithCollectData.NEXT_Z_S = await fetchData(urlGetSpectrum, true);
+    drawAxios("NEXT_Z_S");
 
     setLocalStorageLatestCollectData();
   }

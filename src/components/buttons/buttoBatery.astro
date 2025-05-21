@@ -49,10 +49,12 @@
     }
     voltage = parseFloat(voltage);
 
-    const batteryValue = Math.min(
+    let batteryValue = Math.min(
       100,
       Math.max(0, ((voltage - 3.3) / (4.15 - 3.3)) * 100),
     );
+
+    batteryValue = Math.round(batteryValue * 10) / 10;
 
     updateBatteryClass(batteryValue);
 

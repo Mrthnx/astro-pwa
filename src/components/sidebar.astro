@@ -33,10 +33,12 @@ const VERSION = packageJson.version;
 
   <ButtonCollectData />
 
-  <div class="hidden md:flex text-2xl justify-center items-end gap-2">
+  <div class="flex text-2xl justify-center items-end gap-2">
     <ButtonBatery />
-    Corel Force
-    <span class="text-sm"> {VERSION}</span>
+    <div class="hidden md:block">
+      Corel Force
+      <span class="text-sm"> {VERSION}</span>
+    </div>
   </div>
   <!-- <SwitchBluetooth /> -->
 </nav>

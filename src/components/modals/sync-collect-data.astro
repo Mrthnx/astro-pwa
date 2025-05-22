@@ -265,11 +265,14 @@
       }
       showLoading();
       updateMessage("Syncing surveys...");
+      const total = surveys.length;
+      let current = 1;
       for (const survey of surveys) {
         try {
-          showLoading(); // Muestra el indicador de carga
-          updateMessage(`Syncing survey ${survey.mawoiDescription}...`);
-
+          showLoading();
+          updateMessage(
+            `Syncing survey ${survey.mawoiDescription}... \n Save surveys ${current}/${total}`,
+          );
           const response = await fetch(URL_BACKEND + "/offline/survey", {
             method: "POST",
             headers: {
@@ -278,9 +281,7 @@
             },
             body: JSON.stringify(survey),
           });
-
           const data = await response.json();
-
           if (data && data.response && data.response.httpCode === 500) {
             showAlert(`Error with Mawoi ID: ${survey.mawoiId}`);
             saveErrosMawois(
@@ -288,14 +289,12 @@
             );
             throw new Error("Server error");
           }
-
           if (!data.data) {
             alert("Session expired, please login again");
             localStorage.removeItem("_token_");
             window.location.href = "/";
-            return; // Detenemos la ejecución si la sesión expiró
+            return;
           }
-
           // Aquí puedes manejar cualquier lógica adicional si es necesario
           // mawoisWith = mawoisWith.filter(
           //   (mawoi) => mawoi.plantId !== +plantSyncId,
@@ -304,8 +303,9 @@
         } catch (error) {
           console.error("Error:", error);
         } finally {
-          hideLoading(); // Oculta el indicador de carga
-          hideModalSync(); // Oculta el modal de sincronización si es necesario
+          hideLoading();
+          hideModalSync();
+          current++;
         }
       }
     }

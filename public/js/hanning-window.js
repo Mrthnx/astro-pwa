@@ -36,10 +36,10 @@ function applyHanning(signal) {
   });
 }
 
-function filterHanning(waveform) {
+function filterHanning(waveform, nlines) {
   const windowed = applyHanning(waveform);
   const phasors = fft(windowed);
   const magnitudes = fftMag(phasors);
   for (let i = 0; i < 4; i++) magnitudes[i] = 0;
-  return magnitudes;
+  return magnitudes.slice(0, nlines);
 }

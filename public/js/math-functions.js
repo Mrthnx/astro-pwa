@@ -206,9 +206,7 @@ function processSpectra(arr, fixedMultiplier) {
   //     fixedMultiplier,
   // );
 
-  let result = arr.map((value) => +value * fixedMultiplier);
-
-  result = filterHanning(result);
+  const result = arr.map((value) => +value * fixedMultiplier);
 
   // Convertir el resultado a una cadena separada por comas
   return result;

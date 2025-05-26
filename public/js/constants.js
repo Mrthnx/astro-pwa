@@ -61,5 +61,5 @@ const PARAMS_SPEC = {
   B: 2.333,
   C: 0.7,
   D: 0.006,
-  FIXED: 0.000012,
+  FIXED: 0.0000085714,
 };

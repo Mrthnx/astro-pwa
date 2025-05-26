@@ -4,6 +4,7 @@ import ButtonCollectData from "./buttons/buttonCollectData.astro";
 import ButtonBatery from "./buttons/buttoBatery.astro";
 import ButtonLogout from "./buttons/buttonLogout.astro";
 import ButtonSystemConfig from "./buttons/buttonSystemConfig.astro";
+import ButtonOveralls from "./buttons/buttonOveralls.astro";
 import * as packageJson from "../../package.json";
 
 const VERSION = packageJson.version;
@@ -34,6 +35,7 @@ const VERSION = packageJson.version;
   <ButtonCollectData />
 
   <div class="flex text-2xl justify-center items-end gap-2">
+    <ButtonOveralls />
     <ButtonBatery />
     <div class="hidden md:block">
       Corel Force

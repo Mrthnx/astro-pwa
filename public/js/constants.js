@@ -7,6 +7,7 @@ const SET_VARIABLES = "command?cmd=SET_VARIABLES";
 const GET_WAVE = "data?eje=EJE&modo=waveform";
 const GET_SPECTRA = "data?eje=EJE&modo=spectrum";
 const GET_VOLTAGE = "command?cmd=GET_VOLTAGE";
+const GET_OVERALLS = "command?cmd=GET_OVERALL_MM_S";
 
 const OPTIONS_DRAW = {
   title: {

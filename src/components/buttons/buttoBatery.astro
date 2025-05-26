@@ -49,10 +49,10 @@
     }
     voltage = parseFloat(voltage);
 
-    let batteryValue = Math.min(
-      100,
-      Math.max(0, ((voltage - 3.3) / (4.15 - 3.3)) * 100),
-    );
+    let batteryValue =
+      voltage <= 3.0
+        ? 0
+        : Math.min(100, ((voltage - 3.0) / (4.15 - 3.0)) * 100);
 
     batteryValue = Math.round(batteryValue * 10) / 10;
 

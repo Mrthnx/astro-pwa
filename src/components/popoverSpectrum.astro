@@ -7,15 +7,15 @@ const { chartName } = Astro.props;
     <div
       class="cursor-pointer w-[98vw] pr-1 flex justify-end relative top-4 z-10 px-5 gap-6"
     >
-      <!-- <div class="text-blue-800"> -->
-      <!--   <input -->
-      <!--     id="input-calculate" -->
-      <!--     type="text" -->
-      <!--     class="w-[150px] p-2 text-sm border-blue-800 outline-current border-2 rounded-md" -->
-      <!--     onblur={`calculateSpectrumFixed('${chartName}')`} -->
-      <!--     placeholder="calculate" -->
-      <!--   /> -->
-      <!-- </div> -->
+      <div class="text-blue-800">
+        <input
+          id="input-calculate"
+          type="text"
+          class="w-[150px] p-2 text-sm border-blue-800 outline-current border-2 rounded-md"
+          onblur={`calculateSpectrumFixed('${chartName}')`}
+          placeholder="calculate"
+        />
+      </div>
       <div>
         <button
           class="rounded-md border-2 border-blue-800"

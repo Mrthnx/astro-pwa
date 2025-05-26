@@ -223,25 +223,22 @@
     pointWithCollectData.NEXT_X_W = await fetchData(urlGetWaveform, true);
     drawAxios("NEXT_X_W");
     urlGetSpectrum = urlGetSpectrum.replace("EJE", "x");
-    pointWithCollectData.NEXT_X_S = processSpectra(
-      await fetchData(urlGetSpectrum, true),
-    );
+    const spectrumX = await fetchData(urlGetSpectrum, true);
+    pointWithCollectData.NEXT_X_S = processSpectra(spectrumX);
     drawAxios("NEXT_X_S");
     urlGetWaveform = urlGetWaveform.replace("=x", "=y");
     pointWithCollectData.NEXT_Y_W = await fetchData(urlGetWaveform, true);
     drawAxios("NEXT_Y_W");
     urlGetSpectrum = urlGetSpectrum.replace("=x", "=y");
-    pointWithCollectData.NEXT_Y_S = processSpectra(
-      await fetchData(urlGetSpectrum, true),
-    );
+    const spectrumY = await fetchData(urlGetSpectrum, true);
+    pointWithCollectData.NEXT_Y_S = processSpectra(spectrumY);
     drawAxios("NEXT_Y_S");
     urlGetWaveform = urlGetWaveform.replace("=y", "=z");
     pointWithCollectData.NEXT_Z_W = await fetchData(urlGetWaveform, true);
     drawAxios("NEXT_Z_W");
     urlGetSpectrum = urlGetSpectrum.replace("=y", "=z");
-    pointWithCollectData.NEXT_Z_S = processSpectra(
-      await fetchData(urlGetSpectrum, true),
-    );
+    const spectrumZ = await fetchData(urlGetSpectrum, true);
+    pointWithCollectData.NEXT_Z_S = processSpectra(spectrumZ);
     drawAxios("NEXT_Z_S");
 
     setLocalStorageLatestCollectData();

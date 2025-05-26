@@ -63,8 +63,7 @@
 
 <script is:inline>
   async function calculateOveralls() {
-    const $overall = document.getElementById("overalls");
-    const $overallText = document.getElementById("overalls").querySelector("span");
+    const $overallText = document
       .getElementById("overalls")
       .querySelector("span");
 
@@ -79,6 +78,6 @@
 
     overall = Math.round(overall * 10) / 10;
 
-    overallText.textContent = `${overall}`;
+    $overallText.textContent = `${overall}`;
   }
 </script>

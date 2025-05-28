@@ -151,8 +151,8 @@ import ButtonViewPhotos from "./buttons/buttonViewPhotos.astro";
         }
 
         return {
-          y: Math.round(y * 100) / 100,
-          x: Math.round(x * 100) / 100,
+          y,
+          x,
         };
       });
       CHARTS[eventActive] = agCharts.AgCharts.create({ ...options });

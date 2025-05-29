@@ -177,7 +177,7 @@ function waveformDisplacement(input) {
 }
 
 function processSpectra(arr, fixedMultiplier) {
-  fixedMultiplier = fixedMultiplier ?? PARAMS_SPEC.FIXED;
+  fixedMultiplier = fixedMultiplier ?? PARAMS_SPEC.FIXED * 1.14;
   // Aplicar la condición de umbral y multiplicador
   // arr = arr.map((value) =>
   //   value <= PARAMS_SPEC.THRESHOLD ? value * PARAMS_SPEC.MULTIPLIER : value,

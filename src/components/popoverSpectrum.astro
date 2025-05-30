@@ -78,27 +78,28 @@ const { chartName } = Astro.props;
     let pointInUse = findPointForCollectData(pointSelect.value);
     pointInUse = pointInUse.point;
 
-    let bandsInfo = Object.values(pointInUse.bandsInfo);
+    // let bandsInfo = Object.values(pointInUse.bandsInfo);
+    let bandsInfo = null;
 
     let pointCode = pointInUse.code.substr(0, 2);
 
     let pointsCode = [pointCode + "H", pointCode + "X"];
 
-    if (chartName.includes("_X")) {
-      bandsInfo = bandsInfo.filter((band) =>
-        pointsCode.includes(band.pointCode),
-      );
-    } else if (chartName.includes("_Y")) {
-      pointsCode = [pointCode + "V", pointCode + "Y"];
-      bandsInfo = bandsInfo.filter((band) =>
-        pointsCode.includes(band.pointCode),
-      );
-    } else if (chartName.includes("_Z")) {
-      pointsCode = [pointCode + "A", pointCode + "Z"];
-      bandsInfo = bandsInfo.filter((band) =>
-        pointsCode.includes(band.pointCode),
-      );
-    }
+    //if (chartName.includes("_X")) {
+    //  bandsInfo = bandsInfo.filter((band) =>
+    //    pointsCode.includes(band.pointCode),
+    //  );
+    //} else if (chartName.includes("_Y")) {
+    //  pointsCode = [pointCode + "V", pointCode + "Y"];
+    //  bandsInfo = bandsInfo.filter((band) =>
+    //    pointsCode.includes(band.pointCode),
+    //  );
+    //} else if (chartName.includes("_Z")) {
+    //  pointsCode = [pointCode + "A", pointCode + "Z"];
+    //  bandsInfo = bandsInfo.filter((band) =>
+    //    pointsCode.includes(band.pointCode),
+    //  );
+    //}
 
     const popover = document.getElementById(
       `customPopoverSpectrum_${chartName}`,
@@ -110,15 +111,16 @@ const { chartName } = Astro.props;
 
     const overall = calculateOverall(charts_y);
 
-    let lastBandsInfo = getLastBandsInfoFromStore(chartName);
+    //let lastBandsInfo = getLastBandsInfoFromStore(chartName);
+    let lastBandsInfo = null;
     const pointForBands = findPointForCollectDataByCode(
       mawoiSelect.value,
       pointsCode,
     );
 
-    if (!lastBandsInfo && pointForBands && pointForBands.point) {
-      lastBandsInfo = pointForBands.point.lastBandInfo;
-    }
+    //if (!lastBandsInfo && pointForBands && pointForBands.point) {
+    //  lastBandsInfo = pointForBands.point.lastBandInfo;
+    //}
 
     // Mostrar los valores en el popover
     const popoverContent = document.getElementById(
@@ -135,7 +137,7 @@ const { chartName } = Astro.props;
 <p>Overall: ${overall}</p> `;
     }
 
-    bandsInfo.forEach((band) => {
+    bandsInfo?.forEach((band) => {
       const charts = CHARTS[chartName].chart.data;
       let velocities = spectraVelocity(charts.map((d) => d.y));
 

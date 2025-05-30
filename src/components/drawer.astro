@@ -126,10 +126,6 @@ import ButtonViewPhotos from "./buttons/buttonViewPhotos.astro";
           x = x / 60; // Convert to Hertz
         }
 
-        if (configStore.amplitude == 1) {
-          y = y * 25.4; // Convert to metric
-        }
-
         const factorMap = {
           1: 0.5,
           3: 0.35355,
@@ -144,6 +140,10 @@ import ButtonViewPhotos from "./buttons/buttonViewPhotos.astro";
           typeKey = "vel_type";
         } else if (unitType === 3) {
           typeKey = "dis_type";
+        }
+
+        if (configStore.amplitude == 1 && unitType != 1) {
+          y = y * 25.4; // Convert to metric
         }
 
         if (typeKey && factorMap[configStore[typeKey]]) {

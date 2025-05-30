@@ -40,7 +40,7 @@ function calculateOverall(arr) {
 }
 
 function spectraVelocity(input) {
-  const fixedMultiplier = 2000; // Ajusta este valor según tus necesidades
+  const fixedMultiplier = 2000 * 25; // Ajusta este valor según tus necesidades
   const fullTurn = 360; // Ajusta este valor según tus necesidades
 
   // Convertir la entrada en un array de números
@@ -70,7 +70,7 @@ function spectraVelocity(input) {
 }
 
 function spectraDisplacement(input) {
-  const fixedMultiplier = 2000; // Ajusta este valor según tus necesidades
+  const fixedMultiplier = 2000 * 75; // Ajusta este valor según tus necesidades
   const fullTurn = 360; // Ajusta este valor según tus necesidades
 
   // Convertir la entrada en un array de números
@@ -177,7 +177,12 @@ function waveformDisplacement(input) {
 }
 
 function processSpectra(arr, fixedMultiplier) {
-  fixedMultiplier = fixedMultiplier ?? PARAMS_SPEC.FIXED * 1.14;
+  fixedMultiplier = (fixedMultiplier ?? 1) * PARAMS_SPEC.FIXED * 1.14 * 2.136;
+  // Aplicar la condición de umbral y multiplicador
+  // 0.0000085714 * 1.14 * 2.136 = 0,000020872 ACC
+  // 0.0000085714 * 1.14 * 25 = 0,000244285 VEL
+  // 0.0000085714 * 1.14 * 75 =  0,00000013 DISP
+  //
   // Aplicar la condición de umbral y multiplicador
   // arr = arr.map((value) =>
   //   value <= PARAMS_SPEC.THRESHOLD ? value * PARAMS_SPEC.MULTIPLIER : value,

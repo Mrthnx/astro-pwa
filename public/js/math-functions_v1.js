@@ -40,7 +40,7 @@ function calculateOverall(arr) {
 }
 
 function spectraVelocity(input) {
-  const fixedMultiplier = 2000 * 25; // Ajusta este valor según tus necesidades
+  const fixedMultiplier = 2000 * 25 * 2.51; // Ajusta este valor según tus necesidades
   const fullTurn = 360; // Ajusta este valor según tus necesidades
 
   // Convertir la entrada en un array de números
@@ -114,6 +114,7 @@ function cumulativeTrapezoidalIntegration(data, dx) {
 }
 
 function waveformVelocity(input) {
+  const fixedMultiplier = 5.45;
   // Supongamos que tienes la data de aceleración en un array
   const acceleration = input.map(Number).filter((x) => !isNaN(x)); // Convertir la entrada en un array de números
 
@@ -134,7 +135,7 @@ function waveformVelocity(input) {
     // Centrar la velocidad en 0
     const meanVelocity =
       velocity.reduce((sum, val) => sum + val, 0) / velocity.length;
-    velocity = velocity.map((v) => v - meanVelocity);
+    velocity = velocity.map((v) => (v - meanVelocity) * fixedMultiplier);
 
     return velocity;
   });

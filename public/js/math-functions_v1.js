@@ -40,7 +40,7 @@ function calculateOverall(arr) {
 }
 
 function spectraVelocity(input) {
-  const fixedMultiplier = 2000 * 25 * 0.31375; // Ajusta este valor según tus necesidades
+  const fixedMultiplier = 2000 * 25; // Ajusta este valor según tus necesidades
   const fullTurn = 360; // Ajusta este valor según tus necesidades
 
   // Convertir la entrada en un array de números
@@ -66,11 +66,11 @@ function spectraVelocity(input) {
   }
 
   // Convertir el resultado en una cadena separada por comas
-  return resultsOnce;
+  return resultsOnce.map((v) => v * 0.31375);
 }
 
 function spectraDisplacement(input) {
-  const fixedMultiplier = 2000 * 75 * 0.03103; // Ajusta este valor según tus necesidades
+  const fixedMultiplier = 2000 * 75; // Ajusta este valor según tus necesidades
   const fullTurn = 360; // Ajusta este valor según tus necesidades
 
   // Convertir la entrada en un array de números
@@ -98,7 +98,7 @@ function spectraDisplacement(input) {
   }
 
   // Convertir el resultado en una cadena separada por comas
-  return resultsTwice;
+  return resultsTwice.map((v) => v * 0.03103);
 }
 
 // Integración numérica usando el método del trapecio

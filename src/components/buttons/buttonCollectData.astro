@@ -222,7 +222,7 @@
     urlGetWaveform = urlGetWaveform.replace("EJE", "x");
     let waveformX = await fetchData(urlGetWaveform, true);
     waveformX = processWaveform(waveformX);
-    pointWithCollectData.NEXT_X_W = await fetchData(waveformX, true);
+    pointWithCollectData.NEXT_X_W = waveformX;
     drawAxios("NEXT_X_W");
     urlGetSpectrum = urlGetSpectrum.replace("EJE", "x");
     let spectrumX = await fetchData(urlGetSpectrum, true);
@@ -233,7 +233,7 @@
     urlGetWaveform = urlGetWaveform.replace("=x", "=y");
     let waveformY = await fetchData(urlGetWaveform, true);
     waveformY = processWaveform(waveformY);
-    pointWithCollectData.NEXT_Y_W = await fetchData(waveformY, true);
+    pointWithCollectData.NEXT_Y_W = waveformY;
     drawAxios("NEXT_Y_W");
     urlGetSpectrum = urlGetSpectrum.replace("=x", "=y");
     let spectrumY = await fetchData(urlGetSpectrum, true);
@@ -244,7 +244,7 @@
     urlGetWaveform = urlGetWaveform.replace("=y", "=z");
     let waveformZ = await fetchData(urlGetWaveform, true);
     waveformZ = processWaveform(waveformZ);
-    pointWithCollectData.NEXT_Z_W = await fetchData(waveformZ, true);
+    pointWithCollectData.NEXT_Z_W = waveformZ;
     drawAxios("NEXT_Z_W");
     urlGetSpectrum = urlGetSpectrum.replace("=y", "=z");
     let spectrumZ = await fetchData(urlGetSpectrum, true);

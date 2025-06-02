@@ -40,7 +40,7 @@ function calculateOverall(arr) {
 }
 
 function spectraVelocity(input) {
-  const fixedMultiplier = 2000 * 25 * 2.51; // Ajusta este valor según tus necesidades
+  const fixedMultiplier = 2000 * 25 * 0.31375; // Ajusta este valor según tus necesidades
   const fullTurn = 360; // Ajusta este valor según tus necesidades
 
   // Convertir la entrada en un array de números

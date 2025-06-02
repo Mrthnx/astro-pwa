@@ -70,7 +70,7 @@ function spectraVelocity(input) {
 }
 
 function spectraDisplacement(input) {
-  const fixedMultiplier = 2000 * 75; // Ajusta este valor según tus necesidades
+  const fixedMultiplier = 2000 * 75 * 0.03103; // Ajusta este valor según tus necesidades
   const fullTurn = 360; // Ajusta este valor según tus necesidades
 
   // Convertir la entrada en un array de números
@@ -145,6 +145,7 @@ function waveformVelocity(input) {
 }
 
 function waveformDisplacement(input) {
+  const fixedMultiplier = 50;
   // Convertir la entrada en un array de números
   const acceleration = input.map(Number).filter((x) => !isNaN(x));
 
@@ -170,7 +171,7 @@ function waveformDisplacement(input) {
     // Integración para obtener el desplazamiento
     const displacement = cumulativeTrapezoidalIntegration(velocity, dt);
 
-    return displacement;
+    return displacement.map((v) => v * fixedMultiplier);
   });
 
   // Convertir el resultado en una cadena separada por comas

@@ -220,7 +220,9 @@
     urlGetWaveform = urlGetWaveform.replace("IP", vars.ip);
     urlGetSpectrum = urlGetSpectrum.replace("IP", vars.ip);
     urlGetWaveform = urlGetWaveform.replace("EJE", "x");
-    pointWithCollectData.NEXT_X_W = await fetchData(urlGetWaveform, true);
+    let waveformX = await fetchData(urlGetWaveform, true);
+    waveformX = processWaveform(waveformX);
+    pointWithCollectData.NEXT_X_W = await fetchData(waveformX, true);
     drawAxios("NEXT_X_W");
     urlGetSpectrum = urlGetSpectrum.replace("EJE", "x");
     let spectrumX = await fetchData(urlGetSpectrum, true);
@@ -229,7 +231,9 @@
     pointWithCollectData.NEXT_X_S = spectrumX;
     drawAxios("NEXT_X_S");
     urlGetWaveform = urlGetWaveform.replace("=x", "=y");
-    pointWithCollectData.NEXT_Y_W = await fetchData(urlGetWaveform, true);
+    let waveformY = await fetchData(urlGetWaveform, true);
+    waveformY = processWaveform(waveformY);
+    pointWithCollectData.NEXT_Y_W = await fetchData(waveformY, true);
     drawAxios("NEXT_Y_W");
     urlGetSpectrum = urlGetSpectrum.replace("=x", "=y");
     let spectrumY = await fetchData(urlGetSpectrum, true);
@@ -238,7 +242,9 @@
     pointWithCollectData.NEXT_Y_S = spectrumY;
     drawAxios("NEXT_Y_S");
     urlGetWaveform = urlGetWaveform.replace("=y", "=z");
-    pointWithCollectData.NEXT_Z_W = await fetchData(urlGetWaveform, true);
+    let waveformZ = await fetchData(urlGetWaveform, true);
+    waveformZ = processWaveform(waveformZ);
+    pointWithCollectData.NEXT_Z_W = await fetchData(waveformZ, true);
     drawAxios("NEXT_Z_W");
     urlGetSpectrum = urlGetSpectrum.replace("=y", "=z");
     let spectrumZ = await fetchData(urlGetSpectrum, true);

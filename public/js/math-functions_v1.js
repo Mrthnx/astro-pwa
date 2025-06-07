@@ -145,7 +145,7 @@ function waveformVelocity(input) {
 }
 
 function waveformDisplacement(input) {
-  const fixedMultiplier = 50;
+  const fixedMultiplier = 50 * 0.12;
   // Convertir la entrada en un array de números
   const acceleration = input.map(Number).filter((x) => !isNaN(x));
 

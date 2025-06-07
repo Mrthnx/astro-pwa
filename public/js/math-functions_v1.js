@@ -114,7 +114,7 @@ function cumulativeTrapezoidalIntegration(data, dx) {
 }
 
 function waveformVelocity(input) {
-  const fixedMultiplier = 5.45;
+  const fixedMultiplier = 5.45 / 3.13;
   // Supongamos que tienes la data de aceleración en un array
   const acceleration = input.map(Number).filter((x) => !isNaN(x)); // Convertir la entrada en un array de números
 

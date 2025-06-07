@@ -98,7 +98,7 @@ function spectraDisplacement(input) {
   }
 
   // Convertir el resultado en una cadena separada por comas
-  return resultsTwice.map((v) => v * 0.03103);
+  return resultsTwice.map((v) => (v * 0.03103) / 4.5);
 }
 
 // Integración numérica usando el método del trapecio

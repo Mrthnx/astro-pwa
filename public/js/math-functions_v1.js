@@ -180,7 +180,7 @@ function waveformDisplacement(input) {
 
 function processWaveform(arr, fixedMultiplier) {
   // fixedMultiplier = 2.5;
-  fixedMultiplier = (2.5 * 2) / 1.45;
+  fixedMultiplier = (2.5 * 2 * 1.46) / 1.45;
   const result = arr.map((value) => +value * fixedMultiplier);
   return result;
 }

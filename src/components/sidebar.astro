@@ -14,7 +14,7 @@ const VERSION = packageJson.version;
 <nav
   class="bg-gray-100 text-blue-900 p-4 flex justify-between items-center top-0 left-0 w-full z-10"
 >
-  <div class="flex gap-8">
+  <div class="hidden lg:flex gap-8">
     <button id="menu-button" class="focus:outline-none">
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -37,10 +37,14 @@ const VERSION = packageJson.version;
   <div class="flex text-2xl justify-center items-end gap-2">
     <ButtonOveralls />
     <ButtonBatery />
-    <div class="hidden md:block">
+    <div class="hidden lg:block">
       Corel Force
       <span class="text-sm"> {VERSION}</span>
     </div>
+  </div>
+
+  <div class="block lg:hidden">
+    <ButtonCollectData />
   </div>
   <!-- <SwitchBluetooth /> -->
 </nav>
@@ -108,6 +112,31 @@ const VERSION = packageJson.version;
         sidebar.classList.remove("sidebar-open");
         sidebarIsOpen = false;
       }
+    }
+  });
+
+  let touchStartX = 0;
+  let touchStartY = 0;
+
+  document.addEventListener("touchstart", function (e) {
+    if (e.touches[0].clientX < 40) {
+      // Solo si empieza cerca del borde izquierdo
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+    }
+  });
+
+  document.addEventListener("touchend", function (e) {
+    const touchEndX = e.changedTouches[0].clientX;
+    const touchEndY = e.changedTouches[0].clientY;
+    const diffX = touchEndX - touchStartX;
+    const diffY = Math.abs(touchEndY - touchStartY);
+
+    if (touchStartX < 40 && diffX > 50 && diffY < 30) {
+      setTimeout(() => {
+        sidebarIsOpen = true;
+      }, 50);
+      sidebar.classList.toggle("sidebar-open");
     }
   });
 

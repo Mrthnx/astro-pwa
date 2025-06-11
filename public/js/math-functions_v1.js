@@ -178,9 +178,8 @@ function waveformDisplacement(input) {
   return displacements[0]; // Imprimir solo la primera repetición
 }
 
-function processWaveform(arr, fixedMultiplier) {
-  // fixedMultiplier = 2.5;
-  fixedMultiplier = (2.5 * 2 * 1.46) / 1.45;
+function processWaveform(arr) {
+  const fixedMultiplier = (2.5 * 2 * 1.46) / 1.45;
   const result = arr.map((value) => +value * fixedMultiplier);
   return result;
 }

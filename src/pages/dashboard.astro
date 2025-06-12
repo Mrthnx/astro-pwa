@@ -1,24 +1,26 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import Sidebar from "../components/sidebar.astro";
 import Bluetooth from "../components/bluetooth.astro";
 import Drawer from "../components/drawer.astro";
 import ModalPlants from "../components/modals/plants.astro";
+import ModalMawois from "../components/modals/mawois.astro";
 import ModalPictures from "../components/modals/pictures-mawoi.astro";
 import ModalSyncCollect from "../components/modals/sync-collect-data.astro";
 import ModalSystemConfig from "../components/modals/system-config.astro";
 import AlertError from "../components/alerts/alert-error.astro";
+import Sidebar from "../components/sidebar.astro";
 ---
 
 <Layout title="Dashboard">
   <div
     class="flex flex-col h-full w-full items-center justify-center overflow-y-hidden"
   >
+    <ModalMawois />
+    <ModalPlants />
     <Sidebar />
     <div class="w-full">
       <AlertError />
       <Bluetooth />
-      <ModalPlants />
       <ModalPictures />
       <ModalSyncCollect />
       <ModalSystemConfig />

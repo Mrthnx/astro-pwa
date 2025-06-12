@@ -189,6 +189,24 @@ const VERSION = packageJson.version;
     return null;
   }
 
+  function findSystemForCollectData(id) {
+    let plantsStore = localStorage.getItem("plants") || "[]";
+    plantsStore = JSON.parse(plantsStore);
+    for (let plant of plantsStore) {
+      for (let area of plant.areas) {
+        for (let system of area.systems) {
+          if (system.id == id) {
+            return {
+              system,
+              plant,
+            }; // Termina la función si encuentra el mawoi
+          }
+        }
+      }
+    }
+    return null;
+  }
+
   function savePlantLastUpdatePoint(pointId, vars) {
     let plantsStore = localStorage.getItem("plants") || "[]";
     plantsStore = JSON.parse(plantsStore);
@@ -296,6 +314,11 @@ const VERSION = packageJson.version;
         if (hierarchyName.startsWith("mplant")) {
           pressTimer = setTimeout(() => {
             showModalSync(hierarchyName.split("-")[1]);
+          }, 1000);
+        }
+        if (hierarchyName.startsWith("msystem")) {
+          pressTimer = setTimeout(() => {
+            showModalMawois(hierarchyName.split("-")[1]);
           }, 1000);
         }
       });

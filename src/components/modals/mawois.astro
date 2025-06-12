@@ -1,0 +1,216 @@
+<div
+  id="modal-select-mawoi"
+  class="fixed inset-0 flex flex-col items-center justify-center bg-black bg-opacity-50 z-20 hidden"
+>
+  <div class="bg-white rounded-lg p-4 w-10/12 max-w-md overflow-y-auto">
+    <table id="table-select-mawoi" class="w-full">
+      <thead>
+        <tr>
+          <th class="text-center">System</th>
+          <th class="text-center">Mawoi</th>
+        </tr>
+      </thead>
+      <tbody id="tbody-select-mawoi"> </tbody>
+    </table>
+  </div>
+</div>
+<div
+  id="modal-input-mawoi"
+  class="fixed inset-0 flex flex-col items-center justify-center bg-black bg-opacity-50 z-20 hidden"
+>
+  <div
+    id="form-input-mawoi"
+    class="bg-white rounded-lg p-4 w-10/12 max-w-md overflow-y-auto"
+  >
+    <h3 class="text-xl font-bold text-gray-800 text-center">Add mawoi</h3>
+    <input
+      id="input-mawoi-code"
+      type="text"
+      class="w-full p-2 text-sm border-gray-200 outline-none"
+      placeholder="Insert mawoi code"
+    />
+    <input
+      id="input-mawoi-description"
+      type="text"
+      class="w-full p-2 text-sm border-gray-200 outline-none"
+      placeholder="Insert mawoi description"
+    />
+    <div class="flex gap-2 pt-4">
+      <button
+        id="btn-add-mawoi"
+        onclick="addMawoiInStorage()"
+        class="w-full flex bg-blue-800 hover:bg-blue-900 text-white py-1 px-2 rounded-full justify-center"
+      >
+        <span class="px-2"
+          >Add
+          <i class="fa-solid fa-plus"></i>
+        </span>
+      </button>
+      <button
+        id="btn-close-modal-input-mawoi"
+        onclick="hideModalInputMawoi()"
+        class="w-full flex bg-red-700 hover:bg-red-800 text-white py-1 px-2 rounded-full justify-center"
+      >
+        <span class="px-2"
+          >Close
+          <i class="fa-solid fa-xmark"></i>
+        </span>
+      </button>
+    </div>
+  </div>
+</div>
+<script is:inline>
+  let PLANT_ID;
+  let SYSTEM_ID;
+  let MAWOI_ID;
+
+  let $sidebar;
+  const $modalSelectMawoi = document.getElementById("modal-select-mawoi");
+  const $tableSelectMawoi = document.getElementById("table-select-mawoi");
+  const $modalInputMawoi = document.getElementById("modal-input-mawoi");
+  const $formInputMawoi = document.getElementById("form-input-mawoi");
+
+  let modalMawoiIsOpen = false;
+  let modalInputIsOpen = false;
+
+  function hideModalMawois() {
+    modalMawoiIsOpen = false;
+    $modalSelectMawoi?.classList.add("hidden");
+    hideLoading();
+  }
+  function showModalMawois(sytemId) {
+    $sidebar = document.getElementById("plants-container");
+    setTimeout(() => {
+      modalMawoiIsOpen = true;
+    }, 500);
+    $modalSelectMawoi?.classList.remove("hidden");
+    getMawois(sytemId);
+  }
+
+  function hideModalInputMawoi() {
+    modalInputIsOpen = false;
+    $modalInputMawoi?.classList.add("hidden");
+    hideLoading();
+    PLANT_ID = null;
+    SYSTEM_ID = null;
+    MAWOI_ID = null;
+  }
+  function showModalInputMawoi() {
+    setTimeout(() => {
+      modalInputIsOpen = true;
+    }, 100);
+    $modalInputMawoi?.classList.remove("hidden");
+  }
+
+  function addMawoiInStorage() {
+    const $inputMawoiCode = document.getElementById("input-mawoi-code");
+    const $inputMawoiDescription = document.getElementById(
+      "input-mawoi-description",
+    );
+
+    const valueCode = $inputMawoiCode.value;
+    const valueDescription = $inputMawoiDescription.value;
+
+    if (!valueCode || !valueDescription) {
+      alert("Insert mawoi code and description");
+      return;
+    }
+
+    const plantsStore = localStorage.getItem("plants") || "[]";
+    if (plantsStore) {
+      let plants = JSON.parse(plantsStore);
+      plants = plants.filter(Boolean);
+      plants = plants.map((plant) => {
+        plant.areas.map((area) => {
+          area.systems.map((system) => {
+            console.log("MAWOI_ID", MAWOI_ID);
+            const mawoiFind = system.mawois.find(
+              (mawoi) => mawoi.id == MAWOI_ID,
+            );
+            if (mawoiFind) {
+              console.log(mawoiFind);
+              system.mawois.push({
+                ...mawoiFind,
+                code: valueCode,
+                description: valueDescription,
+                id: 99999900 + Math.floor(Math.random() * 99) + 1,
+              });
+            }
+            return system;
+          });
+          return area;
+        });
+        console.log(plant);
+        return plant;
+      });
+
+      localStorage.setItem("plants", JSON.stringify(plants));
+      createHierarchyList(plants);
+      hideModalMawois();
+      hideModalInputMawoi();
+    }
+  }
+
+  function processRowsMawois(systemId, plantId) {
+    document
+      .querySelectorAll("#table-select-mawoi tr[data-name]")
+      .forEach((tr) => {
+        tr.addEventListener("click", function () {
+          const mawoiId = this.getAttribute("data-name");
+          PLANT_ID = plantId;
+          SYSTEM_ID = systemId;
+          MAWOI_ID = mawoiId;
+          hideModalMawois();
+          showModalInputMawoi();
+        });
+      });
+  }
+
+  function getMawois(sytemId) {
+    const data = findSystemForCollectData(sytemId);
+    console.log(data);
+    const system = data.system;
+    const $tbody = document.getElementById("tbody-select-mawoi");
+    $tbody.innerHTML = "";
+    system.mawois.forEach((mawoi) => {
+      const $tr = document.createElement("tr");
+      const $td1 = document.createElement("td");
+      const $td2 = document.createElement("td");
+      $tr.className = "border-b border-gray-200 cursor-pointer py-2";
+      $tr.dataset.name = mawoi.id;
+      $td1.className = "text-center text-sm";
+      $td2.className = "text-center text-sm";
+      $td1.textContent = system.description;
+      $td2.textContent = mawoi.code + " " + mawoi.description;
+      $tr.appendChild($td1);
+      $tr.appendChild($td2);
+      $tbody.appendChild($tr);
+    });
+
+    processRowsMawois(data.system.id, data.plant.id);
+  }
+
+  document.addEventListener("click", (event) => {
+    // Verificar si el clic fue fuera del div
+    if (loadingActive) return;
+    if (
+      modalMawoiIsOpen &&
+      $tableSelectMawoi &&
+      !$tableSelectMawoi.contains(event.target) &&
+      !$sidebar.contains(event.target)
+    ) {
+      console.log("click out of modal");
+      hideModalMawois();
+    }
+  });
+
+  // Detectar tecla 'ESC'
+  document.addEventListener("keydown", (event) => {
+    if (loadingActive) return;
+    if (event.key === "Escape") {
+      // Verifica si la tecla presionada es 'Escape'
+      hideModalMawois();
+      hideModalInputMawoi();
+    }
+  });
+</script>

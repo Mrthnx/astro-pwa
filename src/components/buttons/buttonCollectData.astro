@@ -1,16 +1,16 @@
 <div>
-  <!-- <button -->
-  <!--   class="w-full rounded-md rounded-green-700 hover:bg-green-800 hover:text-white text-lg text-green-900 border-green-700 border-2 px-2 py-1" -->
-  <!--   onclick="startCollectData()" -->
-  <!--   id="collectData">Collect Data</button -->
-  <!-- > -->
   <button
-    class="w-full rounded-md rounded-green-700 bg-green-700 hover:bg-green-900 text-white text-lg border-2 px-2 py-1 flex items-center justify-center"
-    onclick="startCollectDataWifi()"
-    id="collectData"
+    class="w-full rounded-md rounded-green-700 hover:bg-green-800 hover:text-white text-lg text-green-900 border-green-700 border-2 px-2 py-1"
+    onclick="startCollectData()"
+    id="collectData">Collect Data</button
   >
-    <span> Collect Data </span>
-  </button>
+  <!-- <button -->
+  <!--   class="w-full rounded-md rounded-green-700 bg-green-700 hover:bg-green-900 text-white text-lg border-2 px-2 py-1 flex items-center justify-center" -->
+  <!--   onclick="startCollectDataWifi()" -->
+  <!--   id="collectData" -->
+  <!-- > -->
+  <!--   <span> Collect Data </span> -->
+  <!-- </button> -->
 </div>
 <script is:inline>
   let timeOutChangeMawoiOrPoint = null;
@@ -103,61 +103,105 @@
     );
     await fetchData(urlSetVariables);
 
-    await processCollectData();
+    await processCollectDataWifi();
   }
 
-  // async function startCollectData() {
-  //   clearTimeout(timeOutChangeMawoiOrPoint);
-  //
-  //   if (!toggle.checked) {
-  //     alert("Please turn on Bluetooth!");
-  //     return;
-  //   }
-  //
-  //   const pointInStore = await findPointInCollectData(pointSelect.value);
-  //   if (pointInStore) {
-  //     setBandsInformation(pointInStore.point);
-  //   }
-  //
-  //   mawoisWithCollectData = await getMawoisWithCollectDataStore();
-  //
-  //   let setVariables = getVariablesStore();
-  //   if (!setVariables) {
-  //     setVariablesDefault();
-  //     setVariables = getVariablesStore();
-  //   }
-  //
-  //   if (MAWOI_SELECTED == null) {
-  //     alert("Please select a mawoi!");
-  //     return;
-  //   }
-  //
-  //   showLoading();
-  //   updateMessage("Set variables");
-  //   setTimeout(() => {
-  //     writeOnCharacteristic("SET_SAMPLES=" + setVariables.samples);
-  //     setTimeout(() => {
-  //       writeOnCharacteristic("SET_NLINES=" + setVariables.lines);
-  //       setTimeout(() => {
-  //         writeOnCharacteristic("SET_NREVS=" + setVariables.revolution);
-  //         setTimeout(() => {
-  //           writeOnCharacteristic("SET_FMAX=" + setVariables.fmax);
-  //           setTimeout(() => {
-  //             writeOnCharacteristic("SET_RPM=" + setVariables.rpm);
-  //             setTimeout(() => {
-  //               hideLoading();
-  //               processCollectData();
-  //             }, 500);
-  //           }, 500);
-  //         }, 500);
-  //       }, 500);
-  //     }, 500);
-  //   }, 0);
-  // }
+  async function startCollectData() {
+    clearTimeout(timeOutChangeMawoiOrPoint);
+
+    if (!toggle.checked) {
+      alert("Please turn on Bluetooth!");
+      return;
+    }
+
+    const pointInStore = await findPointInCollectData(pointSelect.value);
+    if (pointInStore) {
+      setBandsInformation(pointInStore.point);
+    }
+
+    mawoisWithCollectData = await getMawoisWithCollectDataStore();
+
+    let setVariables = getVariablesStore();
+    if (!setVariables) {
+      setVariablesDefault();
+      setVariables = getVariablesStore();
+    }
+
+    if (MAWOI_SELECTED == null) {
+      alert("Please select a mawoi!");
+      return;
+    }
+
+    showLoading();
+    updateMessage("Set variables");
+    setTimeout(() => {
+      writeOnCharacteristic("SET_SAMPLES=" + setVariables.samples);
+      setTimeout(() => {
+        writeOnCharacteristic("SET_NLINES=" + setVariables.lines);
+        setTimeout(() => {
+          writeOnCharacteristic("SET_NREVS=" + setVariables.revolution);
+          setTimeout(() => {
+            writeOnCharacteristic("SET_FMAX=" + setVariables.fmax);
+            setTimeout(() => {
+              writeOnCharacteristic("SET_RPM=" + setVariables.rpm);
+              setTimeout(() => {
+                hideLoading();
+                processCollectData();
+              }, 500);
+            }, 500);
+          }, 500);
+        }, 500);
+      }, 500);
+    }, 0);
+  }
 
   let idxMawoi = -1;
 
-  async function processCollectData() {
+  function processCollectData() {
+    drawClear();
+    showLoading();
+    let mawoiStore = getMawoiSelectedStore();
+
+    idxMawoi = -1;
+    if (mawoisWithCollectData && mawoisWithCollectData.length > 0) {
+      idxMawoi = mawoisWithCollectData.findIndex(
+        (mawoi) => mawoi.id === mawoiStore.id,
+      );
+    }
+
+    if (idxMawoi >= 0) {
+      mawoiWithCollectData = mawoisWithCollectData[idxMawoi];
+    } else {
+      mawoiWithCollectData.id = MAWOI_SELECTED.id;
+      mawoiWithCollectData.code = MAWOI_SELECTED.code;
+      mawoiWithCollectData.plantId = MAWOI_SELECTED.plantId;
+      mawoiWithCollectData.description = MAWOI_SELECTED.description;
+      const pointsLength = [
+        ...new Set(
+          MAWOI_SELECTED.points.map((point) => point.code.substr(0, 2)),
+        ),
+      ].length;
+      mawoiWithCollectData.pointLength = pointsLength;
+      mawoiWithCollectData.points = [];
+    }
+
+    const pointSelect = document.getElementById("point-select");
+    pointWithCollectData.id = pointSelect.value;
+    pointWithCollectData.date = new Date().getTime();
+    pointWithCollectData.description =
+      pointSelect.options[pointSelect.selectedIndex].text;
+
+    const vars = getVariablesStore();
+    if (vars) {
+      pointWithCollectData.vars = vars;
+    }
+
+    showLoading();
+    eventActive = "NEXT_X";
+    writeOnCharacteristic("NEXT_X");
+  }
+
+  async function processCollectDataWifi() {
     drawClear();
     showLoading();
     let mawoiStore = getMawoiSelectedStore();

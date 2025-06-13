@@ -35,7 +35,87 @@ const VERSION = packageJson.version;
   <ButtonCollectData />
 
   <div class="flex text-2xl justify-center items-end gap-2">
-    <ButtonOveralls />
+    <!-- <ButtonOveralls /> -->
+    <div>
+      <button
+        class="w-full flex justify-center items-center"
+        id="overalls"
+        onclick="openMenu()"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="inline-block mr-2 align-top"
+          width="30"
+          height="30"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="#000000"
+          stroke-width="1"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <!-- Overalls body -->
+          <rect
+            x="6"
+            y="8"
+            width="12"
+            height="10"
+            rx="2"
+            fill="#e0e7ef"
+            stroke="#000"></rect>
+          <!-- Overalls bib -->
+          <rect
+            x="9"
+            y="4"
+            width="6"
+            height="6"
+            rx="1"
+            fill="#b6c4d6"
+            stroke="#000"></rect>
+          <!-- Left strap -->
+          <rect
+            x="7"
+            y="2"
+            width="2"
+            height="6"
+            rx="1"
+            fill="#b6c4d6"
+            stroke="#000"></rect>
+          <!-- Right strap -->
+          <rect
+            x="15"
+            y="2"
+            width="2"
+            height="6"
+            rx="1"
+            fill="#b6c4d6"
+            stroke="#000"></rect>
+          <!-- Left pocket -->
+          <rect
+            x="8"
+            y="13"
+            width="2"
+            height="3"
+            rx="0.5"
+            fill="#fff"
+            stroke="#000"></rect>
+          <!-- Right pocket -->
+          <rect
+            x="14"
+            y="13"
+            width="2"
+            height="3"
+            rx="0.5"
+            fill="#fff"
+            stroke="#000"></rect>
+          <!-- Bib button left -->
+          <circle cx="8" cy="6" r="0.5" fill="#000"></circle>
+          <!-- Bib button right -->
+          <circle cx="16" cy="6" r="0.5" fill="#000"></circle>
+        </svg>
+        <span class="text-sm"></span>
+      </button>
+    </div>
     <ButtonBatery />
     <div class="hidden lg:block">
       Corel Force
@@ -146,6 +226,13 @@ const VERSION = packageJson.version;
     }, 50);
     sidebar.classList.toggle("sidebar-open");
   });
+
+  function openMenu() {
+    setTimeout(() => {
+      sidebarIsOpen = true;
+    }, 50);
+    sidebar.classList.toggle("sidebar-open");
+  }
 
   function removePlant(id) {
     if (isStatusOnline) {

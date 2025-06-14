@@ -189,7 +189,7 @@ const VERSION = packageJson.version;
       sidebarIsOpen
     ) {
       if (sidebar.classList.contains("sidebar-open")) {
-        sidebar.classList.remove("sidebar-open");
+        sidebar.classList.toggle("sidebar-open");
         sidebarIsOpen = false;
       }
     }
@@ -228,11 +228,12 @@ const VERSION = packageJson.version;
   });
 
   function openMenu() {
-    if (sidebarIsOpen) {
-      return;
-    }
+    console.log("sidebarIsOpen", sidebarIsOpen);
+    // if (sidebarIsOpen) {
+    //   return;
+    // }
     setTimeout(() => {
-      sidebarIsOpen = true;
+      sidebarIsOpen = !sidebarIsOpen;
     }, 50);
     sidebar.classList.toggle("sidebar-open");
   }
@@ -394,6 +395,7 @@ const VERSION = packageJson.version;
               JSON.stringify({ ...mawoiSelected, plantId: plant.id }),
             );
             setInformationMawoi(mawoiSelected, system, plant);
+            sidebarIsOpen = false;
             sidebar.classList.toggle("sidebar-open");
           }
         }
@@ -648,6 +650,8 @@ const VERSION = packageJson.version;
   const $buttonAddPlant = document.getElementById("add-plant");
   if (isStatusOnline && $buttonAddPlant) {
     $buttonAddPlant.addEventListener("click", () => {
+      sidebarIsOpen = false;
+      sidebar.classList.toggle("sidebar-open");
       showModalPlants();
     });
   }

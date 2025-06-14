@@ -77,7 +77,6 @@
       surveys = [];
       syncSurvey.forEach((mawoi) => {
         let { mawoi: mawoiMemory } = findMawoiForCollectData(mawoi.id);
-        console.log(mawoiMemory);
         mawoi.groupedPoints.forEach((points) => {
           let details = {
             mawoiDescription: mawoi.description,
@@ -256,9 +255,92 @@
     }
 
     async function syncSurveyInCloud() {
+      const plantsStore = JSON.parse(localStorage.getItem("plants") || "[]");
+      const mawoisForSync = [];
+      plantsStore.forEach((plant) => {
+        plant.areas.forEach((area) => {
+          area.systems.forEach((system) => {
+            system.mawois.forEach((mawoi) => {
+              if (mawoi.id.toString().includes("9000")) {
+                mawoisForSync.push({
+                  ...mawoi,
+                  systemId: system.id,
+                });
+              }
+            });
+          });
+        });
+      });
+
+      if (mawoisForSync && mawoisForSync.length > 0) {
+        const mawoisSync = mawoisForSync.map((mawoi) => {
+          return {
+            id: mawoi.id,
+            mawoiId: +mawoi.id.toString().replace("9000", ""),
+            typicalMawoiId: mawoi.typicalMawoiId,
+            systemId: mawoi.systemId,
+            code: mawoi.code,
+            description: mawoi.description,
+            points: mawoi.points,
+          };
+        });
+        const token = localStorage.getItem("_token_") || "";
+        const response = await fetch(URL_BACKEND + "/offline/mawois", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(mawoisSync),
+        });
+        const mawoisBD = (await response.json())?.data;
+        plantsStore.forEach((plant) => {
+          plant.areas.forEach((area) => {
+            area.systems.forEach((system) => {
+              system.mawois.forEach((mawoi) => {
+                const mawoiFind = mawoisBD.find((mBD) => mBD.id == mawoi.id);
+                if (mawoiFind) {
+                  mawoi.id = mawoiFind.mawoiId;
+                  mawoiFind.points.forEach((point, idx) => {
+                    mawoi.points[idx].id = point.new;
+                  });
+                }
+              });
+            });
+          });
+        });
+
+        localStorage.setItem("plants", JSON.stringify(plantsStore));
+
+        createHierarchyList(plantsStore);
+
+        const dataStore = await getMawoisWithCollectDataStore();
+
+        dataStore.forEach((mawoi) => {
+          const mawoiFind = mawoisBD.find((mBD) => mBD.id == mawoi.id);
+          if (mawoiFind) {
+            mawoi.id = mawoiFind.mawoiId;
+            mawoi.points.forEach((point, idx) => {
+              const pointFind = mawoiFind.points?.find((pBD) => {
+                console.log(pBD.old);
+                console.log(point.id);
+                console.log(pBD.old == +point.id);
+                return pBD.old == +point.id;
+              });
+              if (pointFind) {
+                point.id = pointFind.new;
+              }
+            });
+          }
+        });
+
+        await saveMawoisWithCollectDataStore(dataStore);
+      }
+
+      // #####################################################
+
       updateMessage("Syncing surveys...");
-      const token = localStorage.getItem("_token_") || "";
-      let mawoisWith = await getMawoisWithCollectDataStore();
+      // const token = localStorage.getItem("_token_") || "";
       if (!surveys || surveys.length == 0) {
         alert("No mawois with collect data");
         return;

@@ -310,13 +310,15 @@ import ButtonViewPhotos from "./buttons/buttonViewPhotos.astro";
 
     const mawoiId = mawoiSelect.value;
     const mawoiFind = findMawoiForCollectData(mawoiId);
-    localStorage.setItem("mawoiSelected", JSON.stringify(mawoiFind.mawoi));
+    if (mawoiFind) {
+      localStorage.setItem("mawoiSelected", JSON.stringify(mawoiFind.mawoi));
 
-    await setInformationMawoi(
-      mawoiFind.mawoi,
-      mawoiFind.system,
-      mawoiFind.plant,
-    );
+      await setInformationMawoi(
+        mawoiFind.mawoi,
+        mawoiFind.system,
+        mawoiFind.plant,
+      );
+    }
   }
 
   function handleChangeDate() {

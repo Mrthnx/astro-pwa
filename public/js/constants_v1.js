@@ -1,4 +1,4 @@
-const URL_BACKEND = "https://backend.pdmmonitor.com/api";
+const URL_BACKEND = "https://app.pdmmonitor.com/api";
 // const URL_BACKEND = "http://localhost:3000/api";
 const ESP32_IP = "http://IP";
 const GET_VARIABLES = "command?cmd=GET_VARIABLES";

@@ -66,7 +66,7 @@ function spectraVelocity(input) {
   }
 
   // Convertir el resultado en una cadena separada por comas
-  return resultsOnce.map((v) => v * 0.31375 * 0.5);
+  return resultsOnce.map((v) => v * 0.31375 * 0.5 * 4.1891);
 }
 
 function spectraDisplacement(input) {
@@ -114,7 +114,7 @@ function cumulativeTrapezoidalIntegration(data, dx) {
 }
 
 function waveformVelocity(input) {
-  const fixedMultiplier = 5.45 / 3.13;
+  const fixedMultiplier = (1.37 * 5.45) / 3.13;
   // Supongamos que tienes la data de aceleración en un array
   const acceleration = input.map(Number).filter((x) => !isNaN(x)); // Convertir la entrada en un array de números
 
@@ -183,6 +183,9 @@ function processWaveform(arr) {
   const result = arr.map((value) => +value * fixedMultiplier);
   return result;
 }
+
+// 0.037 => 0.155
+// 0.155 / 0.037 = 5.45
 
 function processSpectra(arr, fixedMultiplier) {
   fixedMultiplier =

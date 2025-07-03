@@ -6,6 +6,15 @@ function roundedDecimal(value, decimals) {
   return Math.round(value * 10 ** decimals) / 10 ** decimals;
 }
 
+function roundedDecimals(num) {
+  const numStr = num.toFixed(10);
+  const parteDecimal = numStr.split(".")[1];
+  if (parteDecimal.startsWith("00000")) {
+    return Math.trunc(num);
+  }
+  return num;
+}
+
 function peakToPeak(arr) {
   const valMaxY = Math.max(...arr);
   const valMinY = Math.min(...arr);

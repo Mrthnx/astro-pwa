@@ -107,7 +107,7 @@ function spectraDisplacement(input) {
   }
 
   // Convertir el resultado en una cadena separada por comas
-  return resultsTwice.map((v) => (v * 0.03103) / 4.5);
+  return resultsTwice.map((v) => (v * 0.03103 * 3.235) / 4.5);
 }
 
 // Integración numérica usando el método del trapecio
@@ -123,7 +123,7 @@ function cumulativeTrapezoidalIntegration(data, dx) {
 }
 
 function waveformVelocity(input) {
-  const fixedMultiplier = (1.37 * 5.45 * 0.5 * 2.4444) / 3.13;
+  const fixedMultiplier = (1.37 * 5.45 * 0.5 * 2.4444 * 1.1) / 3.13;
   // Supongamos que tienes la data de aceleración en un array
   const acceleration = input.map(Number).filter((x) => !isNaN(x)); // Convertir la entrada en un array de números
 

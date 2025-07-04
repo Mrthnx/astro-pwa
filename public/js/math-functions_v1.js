@@ -198,7 +198,7 @@ function processWaveform(arr) {
 
 function processSpectra(arr, fixedMultiplier) {
   fixedMultiplier =
-    (fixedMultiplier ?? 1) * PARAMS_SPEC.FIXED * 1.14 * 2.136 * 1.59 * 0.9166;
+    (fixedMultiplier ?? 1) * PARAMS_SPEC.FIXED * 1.14 * 2.136 * 1.59;
   // Aplicar la condición de umbral y multiplicador
   // 0.0000085714 * 1.14 * 2.136 = 0,000020872 ACC
   // 0.0000085714 * 1.14 * 25 = 0,000244285 VEL

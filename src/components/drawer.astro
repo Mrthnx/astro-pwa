@@ -216,7 +216,7 @@ import ButtonViewPhotos from "./buttons/buttonViewPhotos.astro";
         ? point.code
         : point.code.includes("-")
           ? point.code.split("-")[0]
-          : point.code.slice(0, 2);
+          : point.code.slice(0, -1);
       const idx = acc.findIndex((p) => p.code === codePoint);
       if (idx < 0) {
         acc.push({

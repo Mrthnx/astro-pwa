@@ -179,6 +179,7 @@
       const pointsLength = [
         ...new Set(
           MAWOI_SELECTED.points.map((point) => point.code.substr(0, 2)),
+          MAWOI_SELECTED.points.map((point) => point.code.slice(0, -1)),
         ),
       ].length;
       mawoiWithCollectData.pointLength = pointsLength;
@@ -223,6 +224,7 @@
       const pointsLength = [
         ...new Set(
           MAWOI_SELECTED.points.map((point) => point.code.substr(0, 2)),
+          MAWOI_SELECTED.points.map((point) => point.code.slice(0, -1)),
         ),
       ].length;
       mawoiWithCollectData.pointLength = pointsLength;
@@ -308,6 +310,7 @@
   ) {
     const bandsInfo = Object.values(pointInUse.bandsInfo);
     const pointCode = pointInUse.code.substr(0, 2);
+    const pointCode = pointInUse.code.slice(0, -1);
     let bandInfoTemp = {
       pointCode: pointCode + COORD,
     };

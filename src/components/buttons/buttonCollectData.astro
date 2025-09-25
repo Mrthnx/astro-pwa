@@ -14,6 +14,7 @@
 </div>
 <script is:inline>
   let timeOutChangeMawoiOrPoint = null;
+  var timeOutChangeMawoiOrPoint = null;
 
   if (timeOutChangeMawoiOrPoint) {
     clearTimeout(timeOutChangeMawoiOrPoint);
@@ -21,6 +22,8 @@
 
   let mawoisWithCollectData = [];
   let mawoiWithCollectData = {
+  var mawoisWithCollectData = [];
+  var mawoiWithCollectData = {
     id: null,
     code: null,
     description: null,
@@ -28,6 +31,7 @@
     points: [],
   };
   let pointWithCollectData = {
+  var pointWithCollectData = {
     id: null,
     date: null,
     NEXT_X_W: [],
@@ -156,6 +160,7 @@
   }
 
   let idxMawoi = -1;
+  var idxMawoi = -1;
 
   function processCollectData() {
     drawClear();
